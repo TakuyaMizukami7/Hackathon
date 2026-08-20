@@ -53,7 +53,9 @@ export default function App() {
           <ul>
             <li>サーバー応答: OK</li>
             <li>サーバー時刻: {health.time}</li>
-            <li>実行リージョン: {health.region}（hnd1 なら東京）</li>
+            <li>環境: {health.env}</li>
+            <li>稼働中のコミット: {health.commit}</li>
+            <li>実行リージョン: {health.region}</li>
             <li>
               LLM APIキー: {health.hasApiKey ? '設定済み' : '未設定（下のチャットは動きません）'}
             </li>

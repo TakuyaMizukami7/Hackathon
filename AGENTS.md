@@ -5,8 +5,9 @@
 
 ## このプロジェクト
 
-- Vite + React + TypeScript の SPA。ホスティングは Vercel。
-- `api/` 配下は Vercel Functions（サーバー側）。LLM の呼び出しは**必ずここ**を経由する。
+- Vite + React + TypeScript の SPA。ホスティングは **Railway**。
+- `server/` 配下は Hono の常駐サーバー。`/api/*` を処理し、ビルド済みの `dist/` も配信する。
+  LLM の呼び出しは**必ずここ**（サーバー側）を経由する。
 - 詳しい開発ルールは [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 触ってよい場所 / いけない場所
@@ -16,9 +17,9 @@
 | 場所 | 扱い |
 | --- | --- |
 | `src/features/<担当機能>/` | 自由に書いてよい |
-| `api/<自分が作ったファイル>.ts` | 自由に書いてよい |
-| `src/shared/`, `src/App.tsx`, `src/index.css` | **共有。指示された変更だけを最小差分で。** |
-| `package.json`, `vercel.json`, `tsconfig*.json`, `.github/` | **明示的に頼まれた時だけ触る** |
+| `server/routes/<自分が作ったファイル>.ts` | 自由に書いてよい |
+| `src/shared/`, `src/App.tsx`, `src/index.css`, `server/index.ts` | **共有。指示された変更だけを最小差分で。** |
+| `package.json`, `railway.json`, `tsconfig*.json`, `.github/` | **明示的に頼まれた時だけ触る** |
 | `src/features/<他人の機能>/` | **絶対に触らない**（読むのは可） |
 
 ## 禁止事項
@@ -35,6 +36,7 @@
 
 - **重複を許す。** 共通化のために他人のファイルへ手を伸ばすより、自分の機能内にコピーする。
 - 新しいコンポーネントは `src/features/<機能>/` の中に作る。`src/components/` を新設しない。
+- 新しい API は `server/routes/<名前>.ts` を新規作成し、`server/index.ts` に 1 行だけ足す。
 - CSS は機能ディレクトリの中に置く。`src/index.css` に追記しない。
 - `index.ts` による re-export のまとめを作らない。
 - 3 分のデモ審査で動くことが最優先。抽象化・汎用化・将来の拡張性は考えない。
@@ -52,6 +54,6 @@ git diff --stat   # 担当外のファイルが混ざっていないか確認
 
 ## 環境変数
 
-- サーバー専用（秘密）: `ANTHROPIC_API_KEY` など。`api/` からのみ `process.env` で読む。
+- サーバー専用（秘密）: `ANTHROPIC_API_KEY` など。`server/` からのみ `process.env` で読む。
 - ブラウザ公開: `VITE_` プレフィックス必須。**秘密情報を入れない。**
-- ローカルは `.env.local`（git 管理外）、本番は Vercel の Environment Variables。
+- ローカルは `.env.local`（git 管理外）、本番は Railway の Variables。

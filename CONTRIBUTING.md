@@ -21,7 +21,7 @@
 | --- | --- | --- |
 | A | @TakuyaMizukami7 | `src/features/____/` |
 | B | @________ | `src/features/____/` |
-| 共有（触る前に一声） | 2人 | `src/shared/`, `src/App.tsx`, `api/`, `package.json`, `vercel.json` |
+| 共有（触る前に一声） | 2人 | `src/shared/`, `src/App.tsx`, `server/index.ts`, `package.json`, `railway.json` |
 
 テーマ発表後 30 分以内にこの表を埋めて commit する。**これが実質のロック機構。**
 
@@ -35,7 +35,7 @@
 - **Pull Request は出すが、レビュー待ちはしない。** CI が通ってプレビューURLで動いたら
   自分でマージしてよい。PR の目的はレビューではなく次の 2 つ。
   - コンフリクトの早期検知
-  - Vercel のプレビュー URL を得て、実機で確認する
+  - Railway の PR 環境のプレビュー URL を得て、実機（スマホ）で確認する
 - マージは **Squash merge** で統一（履歴が 1 行になるので後から追いやすい）。
 - **ブランチの寿命は最長 60 分。** それより長くなりそうなら、動く単位に割って先にマージする。
   長生きブランチ = コンフリクトの原因そのもの。
@@ -64,7 +64,7 @@ gh pr merge --squash --delete-branch
 src/features/photo-upload/     <- A のもの。B は開かない
 src/features/result-board/     <- B のもの。A は開かない
 src/shared/                    <- 共有。触る前に一声かける
-api/xxx.ts                     <- 1 エンドポイント 1 ファイル。作った人が所有
+server/routes/xxx.ts           <- 1 エンドポイント 1 ファイル。作った人が所有
 ```
 
 - 他人のディレクトリは**読んでよいが書き換えない**。直したい所は本人に依頼する。
@@ -87,6 +87,14 @@ api/xxx.ts                     <- 1 エンドポイント 1 ファイル。作�
 // これでよい
 <PhotoUpload />
 <ResultBoard />
+```
+
+### `server/index.ts`
+**ルーティングを 1 行足すだけの場所に保つ。** 処理は `server/routes/<名前>.ts` に書く。
+App.tsx とまったく同じ考え方。
+
+```ts
+app.route('/api/photo', photo)   // これを 1 行足すだけ
 ```
 
 ### `src/shared/types.ts`

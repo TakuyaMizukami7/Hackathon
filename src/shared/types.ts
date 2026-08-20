@@ -25,8 +25,12 @@ export type HealthResponse = {
   ok: boolean
   /** サーバー時刻(ISO8601) */
   time: string
-  /** 実行リージョン。hnd1 なら東京 */
+  /** 実行リージョン。asia-southeast1-eqsg3a ならシンガポール */
   region: string
+  /** 環境名。production / pr-12 など */
+  env: string
+  /** 今動いているコミット(短縮SHA)。自分の変更が反映されたか確認できる */
+  commit: string
   /** LLM の API キーがサーバーに設定されているか */
   hasApiKey: boolean
 }
