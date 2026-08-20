@@ -25,7 +25,7 @@ Railway アカウントの持ち主が行う。
 
 | # | 場所 | 設定 | 理由 |
 | --- | --- | --- | --- |
-| 1 | サービス > Settings > Networking > Public Networking | **Generate Domain を押す** | ★Railway は**自動で公開 URL を付けない。** 押すまで外から見られない（Vercel との最大の違い） |
+| 1 | サービス > Settings > Networking > Public Networking | **Generate Domain を押す**。ターゲットポートは **`8080`**（既定値のまま） | ★Railway は**自動で公開 URL を付けない。** 押すまで外から見られない（Vercel との最大の違い）。ポートは下の「ターゲットポート」を参照 |
 | 2 | サービス > Variables | `ANTHROPIC_API_KEY` を追加 | 無いと `/api/chat` が 500 を返す |
 | 3 | サービス > Settings > Deploy > Region | **Southeast Asia (Singapore)** に変更 | 既定は米国西部。日本からはシンガポール（`asia-southeast1`）が最短。**日本リージョンは無い** |
 | 4 | サービス > Settings > Deploy > Serverless (App Sleeping) | **必ず OFF のまま** | ON にすると、スリープ復帰時の**最初のリクエストが 502 を返すことがある**。審査員の 1 回目のアクセスが 502 になったら終わり |
@@ -34,7 +34,23 @@ Railway アカウントの持ち主が行う。
 > `LLM_MODEL` を Variables に入れると、モデルをコード変更なしで切り替えられる。
 > 未設定なら `claude-opus-5`。デモの応答速度を上げたいときは `claude-haiku-4-5`。
 
-> `PORT` は Railway が自動で注入する。`server/index.ts` は `0.0.0.0:$PORT` で待ち受けている。
+### ターゲットポート（ドメイン生成時に聞かれるポート）
+
+「Enter the port your app is listening on」は、**コンテナの中でアプリが listen するポート**。
+**443 ではない。**
+
+```
+ブラウザ ──443(HTTPS)──> Railway のエッジプロキシ ──8080──> コンテナ
+                          ↑ TLS はここで終端される       ↑ ここを聞かれている
+```
+
+- **`8080`（既定値）を入れる。** Railway がこの値を `PORT` として注入し、
+  [`server/index.ts`](../server/index.ts) が `0.0.0.0:$PORT` で待ち受ける
+- 443 を入れるとコンテナ内で誰も listen していないので `Application failed to respond` になる
+- 生成後、Variables に `PORT` が見当たらなければ `PORT=8080` を手で足す。
+  **ターゲットポートと一致していることだけが条件**
+- ⚠️ **`.env.example` の `PORT=3000` を Railway の Variables にコピーしないこと。**
+  ターゲットポートと食い違って落ちる。あれはローカル専用の値
 
 ### 動作確認
 
