@@ -58,6 +58,7 @@
 | ビルドが通らない | `npm run check` をローカルで実行。CI と同じことをしている |
 | `/api/chat` が 500 | `/api/health` の `hasApiKey` を見る。false なら Railway の Variables が未設定 |
 | デプロイ成功なのに開けない | Railway で **Generate Domain** を押していない（公開URLが存在しない） |
+| `Application failed to respond` | ドメインのターゲットポートと、アプリが listen しているポートが不一致。Variables の `PORT` を確認 |
 | 最初の1回だけ 502 | Serverless(App Sleeping) が ON。OFF にする |
 | 本番に変更が反映されていない気がする | `/api/health` の `commit` を見る。自分の push の SHA と一致するか |
 | 画面が真っ白 | ErrorBoundary が入っているのでエラー文が出るはず。出ないなら main.tsx より前で落ちている |
