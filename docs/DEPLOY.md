@@ -31,6 +31,17 @@ Railway アカウントの持ち主が行う。
 | 4 | サービス > Settings > Deploy > Serverless (App Sleeping) | **必ず OFF のまま** | ON にすると、スリープ復帰時の**最初のリクエストが 502 を返すことがある**。審査員の 1 回目のアクセスが 502 になったら終わり |
 | 5 | プロジェクト > Settings > Environments | **PR 環境を有効化** | PR ごとに使い捨ての URL ができ、相方が実機で確認できる。※設定1でベース環境にドメインが付いていることが前提 |
 
+### 触らなくてよい設定
+
+Railway の設定画面には項目が多いが、**当日必要なのは上の 5 つだけ。** 特に以下は触らない。
+
+| 設定 | どうするか |
+| --- | --- |
+| **Under Attack Mode** | **有効にしない。** 全アクセスの手前にブラウザチェック画面が挟まる。審査員の最初のアクセスでこれが出たら終わり。DDoS を受けている時だけの緊急用 |
+| Serverless (App Sleeping) | **OFF のまま**（設定4の通り。ON だと復帰時の初回が 502 になりうる） |
+| Replicas / Autoscaling | 1 のまま。増やしても審査には効かず、使用量だけ増える |
+| Custom Domain / TCP Proxy | 不要。Generate Domain で出た URL をそのまま提出する |
+
 > `LLM_MODEL` を Variables に入れると、モデルをコード変更なしで切り替えられる。
 > 未設定なら `claude-opus-5`。デモの応答速度を上げたいときは `claude-haiku-4-5`。
 
