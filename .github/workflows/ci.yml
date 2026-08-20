@@ -1,0 +1,39 @@
+# PR と main への push で、型・lint・フォーマット・ビルドを確認する。
+# ここが緑ならデプロイも通る、という状態を保つのが目的。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# 同じブランチで新しい push があったら古い実行は打ち切る（待ち時間の節約）
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          # Vercel 側の Node に合わせる
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: 型チェック
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: フォーマット確認
+        run: npm run format:check
+
+      - name: ビルド
+        run: npm run build

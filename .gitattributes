@@ -1,0 +1,16 @@
+# 改行コードを LF に統一する（Windows/Mac 混在でも「全行が差分」にならないように）
+* text=auto eol=lf
+
+# lockfile は Git に自動マージさせない。
+# コンフリクトしたら package.json を先に解決してから `npm install` で再生成すること。
+package-lock.json -merge
+
+# 画像などのバイナリ
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.mp3 binary
+*.mp4 binary

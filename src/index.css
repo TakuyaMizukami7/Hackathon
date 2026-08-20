@@ -1,0 +1,106 @@
+/*
+  グローバル CSS は「最低限のリセットと共通トークン」だけにする。
+  機能ごとの見た目は src/features/<機能>/ の中に置くこと。
+  ここに全員が追記すると必ずコンフリクトする。
+*/
+:root {
+  color-scheme: light dark;
+  --bg: #14151a;
+  --fg: #e9e9ee;
+  --muted: #9a9aa6;
+  --line: #2c2e37;
+  --accent: #6c8cff;
+  --error: #ff6b6b;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    'Hiragino Sans',
+    'Noto Sans JP',
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.7;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+h2 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+}
+
+.lead {
+  color: var(--muted);
+  margin-top: 0;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.panel ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--fg);
+  background: #1c1e26;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.6rem;
+  resize: vertical;
+}
+
+button {
+  margin-top: 0.75rem;
+  font: inherit;
+  color: #0b0c10;
+  background: var(--accent);
+  border: 0;
+  border-radius: 8px;
+  padding: 0.5rem 1.1rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.answer {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #1c1e26;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 1rem;
+}
+
+.error {
+  color: var(--error);
+}
