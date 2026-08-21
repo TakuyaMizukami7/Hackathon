@@ -29,8 +29,16 @@ export async function streamChat(
   })
 
   if (!res.ok) {
-    const detail = await res.text().catch(() => '')
-    throw new Error(`/api/chat が ${res.status} を返しました: ${detail}`)
+    // サーバーは { error: string } を返す。画面に出すのは中の文だけでよい
+    const body = await res.text().catch(() => '')
+    let detail = body
+    try {
+      const parsed = JSON.parse(body) as { error?: unknown }
+      if (typeof parsed.error === 'string') detail = parsed.error
+    } catch {
+      // JSON でなければ本文をそのまま出す
+    }
+    throw new Error(detail || `/api/chat が ${res.status} を返しました`)
   }
   if (!res.body) throw new Error('レスポンスボディが空です')
 
