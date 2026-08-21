@@ -26,26 +26,27 @@ Railway アカウントの持ち主が行う。
 | # | 場所 | 設定 | 理由 |
 | --- | --- | --- | --- |
 | 1 | サービス > Settings > Networking > Public Networking | **Generate Domain を押す**。ターゲットポートは **`8080`**（既定値のまま） | ★Railway は**自動で公開 URL を付けない。** 押すまで外から見られない（Vercel との最大の違い）。ポートは下の「ターゲットポート」を参照 |
-| 2 | サービス > Variables | `ANTHROPIC_API_KEY` を追加 | 無いと `/api/chat` が 500 を返す |
+| 2 | サービス > Variables | `GEMINI_API_KEY` を追加 | 無いと `/api/chat` が 500 を返す |
 | 3 | サービス > Settings > Deploy > Region | **Southeast Asia (Singapore)** に変更 | 既定は米国西部。日本からはシンガポール（`asia-southeast1`）が最短。**日本リージョンは無い** |
 | 4 | サービス > Settings > Deploy > Serverless (App Sleeping) | **必ず OFF のまま** | ON にすると、スリープ復帰時の**最初のリクエストが 502 を返すことがある**。審査員の 1 回目のアクセスが 502 になったら終わり |
 | 5 | プロジェクト > Settings > Environments | **PR 環境を有効化** | PR ごとに使い捨ての URL ができ、相方が実機で確認できる。※設定1でベース環境にドメインが付いていることが前提 |
 
-### ANTHROPIC_API_KEY の取り方と入れ方
+### GEMINI_API_KEY の取り方と入れ方
 
-**1) キーを取得する**（Claude Code のサブスクとは別物）
+**1) キーを取得する**（無料枠あり・クレジットカード登録不要）
 
-1. https://console.anthropic.com/ にログイン
-2. **Settings > API keys > Create Key** → 名前を付けて作成
-3. `sk-ant-api03-...` が表示される → **その場でコピー**（再表示不可）
-4. ⚠️ **Plans & Billing で残高を追加**（$5〜$10）。残高 0 だとキーが有効でも
-   `credit balance is too low` で API が失敗する。**当日ではなく事前に済ませる**
+1. https://aistudio.google.com/apikey を開いて Google アカウントでログイン
+2. **Create API key** → プロジェクトを選ぶ（無ければ新規作成）
+3. `AIza...` で始まるキーが表示される → **コピー**
+4. 無料枠にはレート制限（1分あたり／1日あたりの回数）がある。
+   デモ直前に連打すると引っかかることがあるので、**リハーサルは早めの時間帯に**。
+   足りなければ Google Cloud 側で課金を有効にすると上限が上がる
 
 **2) Railway に登録する**
 
 1. プロジェクト画面で **サービスのカードをクリック**（プロジェクト設定ではない）
 2. **Variables** タブ > **+ New Variable**
-3. Name = `ANTHROPIC_API_KEY` / Value = `sk-ant-api03-...`（引用符もスペースも不要）
+3. Name = `GEMINI_API_KEY` / Value = `AIza...`（引用符もスペースも不要）
 4. **Add** を押す
 5. ★ 画面上部の **Apply changes / Deploy を押す** ← 忘れやすい。押さないと反映されない
 
@@ -73,7 +74,8 @@ Railway の設定画面には項目が多いが、**当日必要なのは上の 
 | Custom Domain / TCP Proxy | 不要。Generate Domain で出た URL をそのまま提出する |
 
 > `LLM_MODEL` を Variables に入れると、モデルをコード変更なしで切り替えられる。
-> 未設定なら `claude-opus-5`。デモの応答速度を上げたいときは `claude-haiku-4-5`。
+> 未設定なら `gemini-3.7-flash`、速度優先なら `gemini-3.5-flash-lite`。
+> **モデルIDが弾かれたときの逃げ道でもある**（コードを触らず変数だけ直せる）。
 
 ### ターゲットポート（ドメイン生成時に聞かれるポート）
 
@@ -110,7 +112,7 @@ Railway のダッシュボードを開かずに確認できる（＝相方も確
 
 ```bash
 npm install
-cp .env.example .env.local     # ANTHROPIC_API_KEY を書く
+cp .env.example .env.local     # GEMINI_API_KEY を書く
 npm run dev
 ```
 

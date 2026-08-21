@@ -7,7 +7,11 @@
  *   3. ロジックを書かない（型と定数だけ）。ロジックを書くとコンフリクトする
  */
 
-/** チャット 1 往復のメッセージ */
+/**
+ * チャット 1 往復のメッセージ。
+ * role はフロントで扱いやすい 'user' | 'assistant' で統一する。
+ * Gemini 側の 'user' | 'model' への変換は server/routes/chat.ts が行う。
+ */
 export type ChatMessage = {
   role: 'user' | 'assistant'
   content: string

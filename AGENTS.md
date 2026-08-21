@@ -54,6 +54,6 @@ git diff --stat   # 担当外のファイルが混ざっていないか確認
 
 ## 環境変数
 
-- サーバー専用（秘密）: `ANTHROPIC_API_KEY` など。`server/` からのみ `process.env` で読む。
+- サーバー専用（秘密）: `GEMINI_API_KEY` など。`server/` からのみ `process.env` で読む。
 - ブラウザ公開: `VITE_` プレフィックス必須。**秘密情報を入れない。**
 - ローカルは `.env.local`（git 管理外）、本番は Railway の Variables。

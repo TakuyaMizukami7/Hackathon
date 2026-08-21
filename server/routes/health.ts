@@ -18,7 +18,7 @@ health.get('/', (c) => {
     region: process.env.RAILWAY_REPLICA_REGION ?? 'local',
     env: process.env.RAILWAY_ENVIRONMENT_NAME ?? 'local',
     commit: (process.env.RAILWAY_GIT_COMMIT_SHA ?? 'local').slice(0, 7),
-    hasApiKey: Boolean(process.env.ANTHROPIC_API_KEY),
+    hasApiKey: Boolean(process.env.GEMINI_API_KEY),
   }
   return c.json(body, 200, { 'cache-control': 'no-store' })
 })

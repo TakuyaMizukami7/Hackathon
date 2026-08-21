@@ -17,7 +17,7 @@ AI ハッカソン用のリポジトリ。**当日は「画面とロジック」
 
 ```bash
 npm install
-cp .env.example .env.local     # ANTHROPIC_API_KEY を書く
+cp .env.example .env.local     # GEMINI_API_KEY を書く
 npm run dev                    # 画面(5173) と API(3000) が同時に立ち上がる
 ```
 
