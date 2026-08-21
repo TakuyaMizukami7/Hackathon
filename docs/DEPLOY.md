@@ -31,6 +31,35 @@ Railway アカウントの持ち主が行う。
 | 4 | サービス > Settings > Deploy > Serverless (App Sleeping) | **必ず OFF のまま** | ON にすると、スリープ復帰時の**最初のリクエストが 502 を返すことがある**。審査員の 1 回目のアクセスが 502 になったら終わり |
 | 5 | プロジェクト > Settings > Environments | **PR 環境を有効化** | PR ごとに使い捨ての URL ができ、相方が実機で確認できる。※設定1でベース環境にドメインが付いていることが前提 |
 
+### ANTHROPIC_API_KEY の取り方と入れ方
+
+**1) キーを取得する**（Claude Code のサブスクとは別物）
+
+1. https://console.anthropic.com/ にログイン
+2. **Settings > API keys > Create Key** → 名前を付けて作成
+3. `sk-ant-api03-...` が表示される → **その場でコピー**（再表示不可）
+4. ⚠️ **Plans & Billing で残高を追加**（$5〜$10）。残高 0 だとキーが有効でも
+   `credit balance is too low` で API が失敗する。**当日ではなく事前に済ませる**
+
+**2) Railway に登録する**
+
+1. プロジェクト画面で **サービスのカードをクリック**（プロジェクト設定ではない）
+2. **Variables** タブ > **+ New Variable**
+3. Name = `ANTHROPIC_API_KEY` / Value = `sk-ant-api03-...`（引用符もスペースも不要）
+4. **Add** を押す
+5. ★ 画面上部の **Apply changes / Deploy を押す** ← 忘れやすい。押さないと反映されない
+
+**3) 確認する**
+
+`https://<ドメイン>/api/health` の `hasApiKey` が `true` になれば成功。
+`false` のままなら、変数名のタイプミスか Apply changes の押し忘れ。
+
+> Raw Editor で `.env` 形式の一括貼り付けもできるが、
+> **`.env.example` の中身をそのまま貼らないこと**（`PORT=3000` が混ざって落ちる）。
+
+> PR 環境を有効にしている場合、変数は環境ごとに持つ。PR 環境が作られた時点の
+> ベース環境の変数を引き継ぐので、**キーを入れてから PR を立てる**方が確実。
+
 ### 触らなくてよい設定
 
 Railway の設定画面には項目が多いが、**当日必要なのは上の 5 つだけ。** 特に以下は触らない。
