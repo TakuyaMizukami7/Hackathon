@@ -18,6 +18,9 @@ cat docs/devlog/*.md           # 4. 2人それぞれの直近の作業ログと�
 
 そのうえで [AGENTS.md](AGENTS.md) を読む。**`/catchup` と打てばこの手順をまとめて実行できる。**
 
+なお 1〜4 はセッション開始時に自動で読み込まれる（`.claude/settings.json` の SessionStart フックが
+`.claude/hooks/catchup.mjs` を実行する）。手元に情報が既にある場合、同じコマンドを打ち直す必要はない。
+
 把握した内容を 3〜5 行でユーザーに要約してから、依頼に取りかかること。
 （例：「今 main にいて未コミットの変更なし。直近は写真アップロードのUIまで完成、
 `/api/photo` は未着手。相方が types.ts に PhotoResult 型を追加済み」）
