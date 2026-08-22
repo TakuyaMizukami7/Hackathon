@@ -565,12 +565,16 @@
   }
 }
 
-/* 未入力・展開中。光を消して「まだレンズは働いていない」ことを見せる */
+/* 未入力・展開中。光を落として「まだレンズは働いていない」ことを見せる。
+   ただし背景の絵に溶けて ▽ の形まで消えてしまわないよう、
+   暗い側に振った塗りを残す（opacity で薄めると形ごと消える） */
 .bf__submit:disabled {
-  opacity: 0.55;
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.04);
-  filter: none;
+  opacity: 1;
+  color: rgba(233, 233, 238, 0.5);
+  background:
+    linear-gradient(180deg, rgba(125, 165, 180, 0.16), rgba(90, 120, 135, 0.06)),
+    rgba(8, 12, 18, 0.34);
+  filter: drop-shadow(0 0 7px rgba(34, 211, 238, 0.14));
   text-shadow: none;
 }
 
@@ -669,4 +673,75 @@
     transform: none;
     filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.7));
   }
+}
+
+/* --- 背景（FE-7） ---
+
+   public/lens-bg.svg（レンズの虹彩・屈折した光・別次元へ続くグリッド）を画面いっぱいに敷く。
+   グローバル(src/index.css)の body には足さない。この機能の疑似要素で viewport を覆う。
+
+   重ねる順（上が手前）:
+     1. 粒子   … 静止画のノイズ。安いタイルの繰り返しにする（大きい feTurbulence は重い）
+     2. 走査線 … CRT ごしに覗いている感じ
+     3. 周辺減光 … 中央に視線を集める
+     4. 減光幕 … 本文を読める明るさまで絵を落とす。ここが無いと絵が勝つ
+     5. 絵
+     6. 下地色 … 画像が落ちても真っ黒にならないように */
+.bf::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: #06080c;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px),
+    radial-gradient(125% 95% at 50% 24%, transparent 44%, rgba(3, 5, 8, 0.78) 100%),
+    linear-gradient(
+      180deg,
+      rgba(6, 8, 12, 0.26) 0%,
+      rgba(6, 8, 12, 0.44) 58%,
+      rgba(6, 8, 12, 0.66) 100%
+    ),
+    url('/lens-bg.svg');
+  background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat;
+  background-size:
+    160px 160px,
+    auto,
+    cover,
+    cover,
+    cover;
+  background-position:
+    0 0,
+    0 0,
+    center,
+    center,
+    center top;
+}
+
+/* 背景が入ったので、パネルを少しだけ透かして「レンズごしに見ている」ようにする。
+   ペルソナごとの本文（.bf-item__body-inner）は不透明のままにして、別次元の内装を潰さない */
+.bf-item {
+  background: rgba(22, 25, 33, 0.74);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+.bf__input {
+  background: rgba(18, 21, 28, 0.66);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* チップは数が多いので backdrop-filter は掛けない（小さいうえに枚数ぶん重くなる）。
+   透過だけで背景に馴染ませる */
+.bf__chip {
+  background: rgba(22, 25, 33, 0.66);
+}
+
+.bf__disclaimer {
+  border-top-color: rgba(255, 255, 255, 0.09);
 }
