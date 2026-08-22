@@ -26,6 +26,8 @@ export function BiasFilter() {
   const [errorMessage, setErrorMessage] = useState('')
   /** 実行を開始した時刻(performance.now())。経過秒数の表示に使う */
   const [startedAt, setStartedAt] = useState<number | null>(null)
+  /** 「最新ニュース取得」を押すまではお題チップを隠す */
+  const [samplesShown, setSamplesShown] = useState(false)
 
   /** `?mock=` の判定は起動時に 1 回だけ */
   const [mock] = useState(readMockMode)
@@ -75,18 +77,30 @@ export function BiasFilter() {
       </header>
 
       <div className="bf__samples">
-        <span className="bf__samples-label">お題を選ぶ</span>
-        {SAMPLE_INPUTS.map((sample) => (
+        {samplesShown ? (
+          <>
+            <span className="bf__samples-label">ニュースを選ぶ</span>
+            {SAMPLE_INPUTS.map((sample) => (
+              <button
+                key={sample.label}
+                type="button"
+                className="bf__chip"
+                onClick={() => setText(sample.text)}
+                disabled={loading}
+              >
+                {sample.label}
+              </button>
+            ))}
+          </>
+        ) : (
           <button
-            key={sample.label}
             type="button"
-            className="bf__chip"
-            onClick={() => setText(sample.text)}
-            disabled={loading}
+            className="bf__chip bf__chip--fetch"
+            onClick={() => setSamplesShown(true)}
           >
-            {sample.label}
+            最新ニュース取得
           </button>
-        ))}
+        )}
       </div>
 
       <textarea
