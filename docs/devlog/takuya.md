@@ -28,8 +28,11 @@
   → [#14](https://github.com/TakuyaMizukami7/Hackathon/issues/14) に切り出した
 - **次やること**: FE-3（アコーディオンのアニメーション）。BE-1 が入ったら #14 の疎通確認
 - **相方への申し送り**:
-  - **`vite.config.ts` の proxy は `http://localhost:3000`（既存 Hono）のまま**。
-    FastAPI 新規（8000）にするならここを変える必要がある → [#15](https://github.com/TakuyaMizukami7/Hackathon/issues/15)
+  - **バックエンドは FastAPI に決定（[#15](https://github.com/TakuyaMizukami7/Hackathon/issues/15)）。
+    `vite.config.ts` の proxy を `http://localhost:8000` に変えた。**
+    既存の Hono(3000) はもう `/api/*` を受け取らないので、開発中は uvicorn を 8000 で起動すること。
+    `npm run dev:api`（Hono）と Railway の start コマンドの差し替えは BE-1
+    ([#8](https://github.com/TakuyaMizukami7/Hackathon/issues/8)) 側でお願いしたい
   - フロントは `POST /api/expand` に `{ text }` を投げ、`?mock=1` が付いたら固定応答を期待する。
     エラーは **HTTP ステータス + `{ error: string }`** で返してほしい（その文をそのまま画面に出す）
 
