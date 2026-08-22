@@ -3,10 +3,10 @@ import type { Perspective } from '../../shared/types'
 import { PerspectiveItem } from './PerspectiveItem'
 
 /**
- * 4 つのドロップダウンを PERSONA_IDS の順に並べる。
+ * 5 つのドロップダウンを PERSONA_IDS の順に並べる。
  * 並び順は API の返り順ではなく必ずこの定数に従う（AI の返り順を信用しない）。
  *
- * perspectives が空でも 4 つ描く。生成待ちの間もペルソナ名を見せるため。
+ * perspectives が空でも 5 つ描く。生成待ちの間もペルソナ名を見せるため。
  */
 export function PerspectiveList({
   perspectives,

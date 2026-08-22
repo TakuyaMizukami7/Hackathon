@@ -28,6 +28,7 @@ export const THINKING_LINES: Record<PersonaId, string[]> = {
     '教科書の一行を書いています',
   ],
   realist_investor: ['数字に落としています', 'どこに金が流れるか計算中', 'チャートを見ています'],
+  alien_invader: ['友好的に観察しています', '資源価値を査定中…', 'にっこり、本音は別'],
 }
 
 /** 独り言を入れ替える間隔 */

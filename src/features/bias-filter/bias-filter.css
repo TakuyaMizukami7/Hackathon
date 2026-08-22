@@ -170,6 +170,13 @@
   font-size: 0.93rem;
 }
 
+/* AI が本文中で「ここが一番偏っている」と示した一文（Markdown の **太字**）を強調する。
+   ペルソナごとの内装（別次元スタイル）を上書きしないよう、色は currentColor ベースにする */
+.bf-item__emphasis {
+  font-weight: 700;
+  color: var(--bf-persona, currentColor);
+}
+
 .bf-item__meta {
   display: flex;
   align-items: center;
@@ -265,6 +272,9 @@
 }
 .bf-item--in:nth-child(4) {
   animation-delay: 240ms;
+}
+.bf-item--in:nth-child(5) {
+  animation-delay: 320ms;
 }
 
 @keyframes bf-rise {
@@ -474,6 +484,9 @@
 }
 .bf-item--thinking:nth-child(4) {
   animation-delay: 0.6s;
+}
+.bf-item--thinking:nth-child(5) {
+  animation-delay: 0.8s;
 }
 
 @keyframes bf-edge {
