@@ -162,3 +162,85 @@
   border-radius: 999px;
   padding: 0.05rem 0.55rem;
 }
+
+/* --- 待ち時間とエラー（FE-2） --- */
+
+/* 本文が来る前の場所取り。pulse でここが「これから埋まる」ことを見せる */
+.bf__summary--skeleton,
+.bf-item__skeleton {
+  display: block;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--line), #3a3d49, var(--line));
+  background-size: 200% 100%;
+  animation: bf-pulse 1.2s ease-in-out infinite;
+}
+
+.bf__summary--skeleton {
+  width: 62%;
+  height: 0.9em;
+}
+
+.bf-item__skeleton {
+  width: 45%;
+  height: 1em;
+  margin: 0.2em 0;
+}
+
+/* 幅を少しずつ変えて、4 本が同時に光る「機械っぽさ」を減らす */
+.bf-item:nth-child(2) .bf-item__skeleton {
+  width: 58%;
+  animation-delay: 0.15s;
+}
+.bf-item:nth-child(3) .bf-item__skeleton {
+  width: 50%;
+  animation-delay: 0.3s;
+}
+.bf-item:nth-child(4) .bf-item__skeleton {
+  width: 64%;
+  animation-delay: 0.45s;
+}
+
+@keyframes bf-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bf__summary--skeleton,
+  .bf-item__skeleton {
+    animation: none;
+  }
+}
+
+.bf-item__headline--empty {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.bf__error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--error);
+  border-radius: 8px;
+  background: rgba(255, 107, 107, 0.08);
+}
+
+.bf__error-text {
+  color: var(--error);
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.bf__retry {
+  flex: none;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+}
