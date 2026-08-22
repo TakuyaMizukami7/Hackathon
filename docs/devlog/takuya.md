@@ -4,6 +4,48 @@
 
 ---
 
+## 2026-08-22 13:50 — FE-4: デモ用の仕上げ（サンプルチップ・免責・タイトル）と配線サンプルの撤去
+
+- **やったこと**（[#7](https://github.com/TakuyaMizukami7/Hackathon/issues/7)）:
+  - `samples.ts` を新設し、**サンプル入力チップを 3 つ**（SNSのアルゴリズム公開 / 自動運転タクシー解禁 /
+    新作おにぎり発売）。クリックで textarea に流し込む。文面は Issue #7 = BE-3 の確認済みと同じ
+  - textarea の初期値を `MOCK_INPUT` から **空文字**に変更。空欄では `▽ 展開する` が disabled
+  - `bf__title` を h2 → **h1**（配線サンプルを消して、これが画面唯一の見出しになったため）。
+    キャッチコピーを「ひとつの出来事を、4 人の偏った語り手が同時に解説する。事実は 1 つ、解釈は 4 つ。」に
+  - フッターに免責を常設（`bf__disclaimer`）: 「表示される解説は AI が特定の立場を演じたものです。事実ではありません。」
+  - `index.html` の `<title>` を `Bias Filter ▽`、`public/favicon.svg` を絵文字 🔻 の SVG に差し替え
+  - **配線サンプル（Hackathon App）を撤去**: `App.tsx` から `/api/health` と `/api/chat` の
+    2 パネルを削除し、`<main><BiasFilter /></main>` だけにした。
+    `src/index.css` からも、そこでしか使っていなかった `.lead` / `.answer` を削除
+- **決めたこと**:
+  - **`src/shared/api.ts`（`fetchHealth` / `streamChat`）とサーバーの `/api/chat` は残した。**
+    画面から呼ばなくなっただけで、疎通確認と事故対応では今も使う（docs/DEPLOY.md の手順が参照している）
+  - **`.panel` / `.error` は index.css に残す。** `ErrorBoundary` がまだ使っている
+  - ヘッダー・免責は `App.tsx` ではなく `BiasFilter.tsx` に置いた。見た目は
+    `src/features/bias-filter/` の中で完結させ、App.tsx は機能を並べるだけに保つため
+  - チップは**流し込むだけで自動実行はしない**。`▽` を押す瞬間がデモの見せ場なので潰さない
+- **検証済み（ヘッドレス Chrome + CDP で実際にクリックしてスクショ）**:
+  - 初期表示: チップ 3 つ・空の textarea・**disabled のボタン**・免責が 1 画面に収まる
+  - チップ「新作おにぎり発売」→ `▽` → **ローディング中はチップも disabled**、
+    4 件のスケルトンとペルソナ名が出る → 完了後に 4 件すべて展開してもレイアウトが崩れない
+  - `POST /api/expand?mock=1` に**サンプル 3 文すべて**を投げて 200 / 4 件 /
+    `PERSONA_IDS` と同じ順で返ることを確認
+  - `npm run check`（typecheck / oxlint / prettier）は通っている
+- **未検証（ここだけ残っている）**:
+  - **本番 URL での確認が丸ごと未消化。** 手元に Railway のドメインが無く、
+    `docs/DEPLOY.md` にも実URLが書かれていない。`.env.local` も無いので
+    **ローカルでは実 Gemini（`?mock=` なし）を一度も叩けていない**。
+    → 本番 URL でサンプル 3 つとも結果が出ることの確認は、URL が分かり次第やる
+  - 手で操作したときの滑らかさ（チップ → ▽ の一連の流れ）
+- **次やること**: 本番 URL でサンプル 3 つの実応答を確認 → デモリハーサル
+- **相方への申し送り**:
+  - **`App.tsx` を大きく削った**（配線サンプルの 2 パネル）。ここは 2 人が触る唯一の画面ファイルなので、
+    未マージのブランチがあるならコンフリクトに注意。今の中身は 3 行だけ
+  - `src/shared/types.ts` は**変更なし**。サーバー側も**変更なし**
+  - **`/api/health` の `model` フィールドが手元の :3000 の応答に無かった**が、
+    これは前のセッションから残っていた古いプロセスが 3000 を掴んでいたため。
+    `server/routes/health.ts:27` にはコードが入っているので実装の問題ではない
+
 ## 2026-08-22 13:20 — FE-3: 展開アニメーションと「▽」の演出
 
 - **やったこと**（[#6](https://github.com/TakuyaMizukami7/Hackathon/issues/6)）: `PerspectiveItem.tsx` と

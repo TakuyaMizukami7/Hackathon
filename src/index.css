@@ -47,11 +47,6 @@ h2 {
   margin: 0 0 0.75rem;
 }
 
-.lead {
-  color: var(--muted);
-  margin-top: 0;
-}
-
 .panel {
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -90,15 +85,6 @@ button {
 button:disabled {
   opacity: 0.5;
   cursor: default;
-}
-
-.answer {
-  white-space: pre-wrap;
-  word-break: break-word;
-  background: #1c1e26;
-  border-radius: 8px;
-  padding: 0.75rem;
-  margin-top: 1rem;
 }
 
 .error {
