@@ -6,6 +6,8 @@ import { PERSONA_META } from './personas'
  * ペルソナ 1 人分のドロップダウン。
  * 中身(perspective)が無いときは、名前だけ出して見出しをスケルトンにする。
  * ローディング中もペルソナ名を先に出せるのがこの設計の狙い。
+ *
+ * 開閉は排他にしない。4 つ同時に開いて見比べるのがこのアプリの見せ場。
  */
 export function PerspectiveItem({
   id,
@@ -21,7 +23,11 @@ export function PerspectiveItem({
   const ready = perspective !== undefined
 
   return (
-    <li className="bf-item" style={{ borderLeftColor: meta.color }}>
+    // 中身が揃った瞬間に --in が付き、CSS 側の順番待ちアニメーションが 1 回だけ走る
+    <li
+      className={ready ? 'bf-item bf-item--in' : 'bf-item'}
+      style={{ borderLeftColor: meta.color }}
+    >
       <button
         type="button"
         className="bf-item__head"
@@ -51,29 +57,38 @@ export function PerspectiveItem({
         </span>
       </button>
 
-      {open && ready && (
-        <div className="bf-item__body">
-          <p className="bf-item__text">{perspective.body}</p>
-          <div className="bf-item__meta">
-            <span className="bf-item__bias" title={`バイアスの強さ ${perspective.biasLevel} / 5`}>
-              バイアス
-              <span className="bf-item__bars">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <span
-                    key={n}
-                    className="bf-item__bar"
-                    style={{ background: n <= perspective.biasLevel ? meta.color : undefined }}
-                  />
-                ))}
-              </span>
-            </span>
-            <span className="bf-item__tags">
-              {perspective.keywords.map((word) => (
-                <span key={word} className="bf-item__tag">
-                  #{word}
+      {/* 開閉のアニメーションのため、閉じている間も DOM に残す（高さは CSS の 0fr → 1fr で動かす）。
+          条件レンダリングに戻すと閉じるときのトランジションが効かなくなる */}
+      {ready && (
+        <div className="bf-item__body" data-open={open}>
+          <div className="bf-item__body-clip">
+            <div className="bf-item__body-inner">
+              <p className="bf-item__text">{perspective.body}</p>
+              <div className="bf-item__meta">
+                <span
+                  className="bf-item__bias"
+                  title={`バイアスの強さ ${perspective.biasLevel} / 5`}
+                >
+                  バイアス
+                  <span className="bf-item__bars">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <span
+                        key={n}
+                        className="bf-item__bar"
+                        style={{ background: n <= perspective.biasLevel ? meta.color : undefined }}
+                      />
+                    ))}
+                  </span>
                 </span>
-              ))}
-            </span>
+                <span className="bf-item__tags">
+                  {perspective.keywords.map((word) => (
+                    <span key={word} className="bf-item__tag">
+                      #{word}
+                    </span>
+                  ))}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       )}

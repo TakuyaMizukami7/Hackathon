@@ -4,6 +4,35 @@
 
 ---
 
+## 2026-08-22 13:20 — FE-3: 展開アニメーションと「▽」の演出
+
+- **やったこと**（[#6](https://github.com/TakuyaMizukami7/Hackathon/issues/6)）: `PerspectiveItem.tsx` と
+  `bias-filter.css` だけを変更。
+  - 開閉を **`grid-template-rows: 0fr → 1fr` + transition 240ms** にした。`max-height` のハックは使っていない
+  - 結果の 4 件が **80ms ずつずれて**下から浮かびながら現れる（`bf-item--in` + `nth-child` の `animation-delay`）
+  - `▽` が開くと **180° 回転**して `△` になる
+  - 開閉は排他にしない（4 つ同時に開いて見比べるのがこのアプリの肝）
+- **決めたこと**:
+  - **閉じている間も本文を DOM に残す。** 条件レンダリング（`{open && ...}`）に戻すと
+    閉じるときのトランジションが効かなくなる
+  - **`body` を 3 層にした**（`__body`=grid / `__body-clip`=overflow hidden / `__body-inner`=padding）。
+    padding を grid item 側に置くと、`border-box` の都合で**閉じきっても下端が 14px ほど残る**
+  - `__body-clip` は閉じている間 `visibility: hidden`（`transition-delay: 240ms` で閉じ終わってから消す）。
+    こうすると隠れている本文に Tab が入らず、読み上げも拾わない
+  - 演出の起点は **`perspective` が来たかどうか**（`ready`）。ローディング → 完了で class が付き、
+    アニメーションが 1 回だけ走る
+  - `biasLevel` のメーターと `keywords` のタグは FE-1 の時点で既にあったので触っていない
+- **検証済み（Chrome ヘッドレスで実物のスクリーンショット）**:
+  - **閉**: 4 件が同じ高さで並び、**padding の残りが無い**。入力欄 + 4 件の見出しが
+    1920×1080 で**スクロールなしに収まる**（最下端 ≈ 695px）
+  - **開**: 4 件すべて同時に開いてもレイアウトが崩れず、caret が △ に回っている
+  - `npm run check`（typecheck / oxlint / prettier）は通っている
+- **未検証**: **手で操作したときの滑らかさ**（開閉の途中経過とスタガーはスクショでは見えない）。
+  ブラウザでの目視は引き続き [#14](https://github.com/TakuyaMizukami7/Hackathon/issues/14)
+- **次やること**: #14 のブラウザ目視。BE-2 が入ったら本物の応答で 4 件のスタガーを確認する
+- **相方への申し送り**: 触ったのは `src/features/bias-filter/` の 2 ファイルだけ。
+  共有ファイル（`types.ts` / `vite.config.ts` / `App.tsx`）は**変更なし**
+
 ## 2026-08-22 — proxy を Hono(3000) に戻し、/api/expand と実疎通した
 
 - **やったこと**: `vite.config.ts` の proxy 先を `http://localhost:8000` から
