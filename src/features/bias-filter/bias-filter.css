@@ -681,35 +681,53 @@
   }
 }
 
-/* --- 背景（FE-7） ---
+/* --- 背景（FE-7 / 色味と視認性の作り直しは FE-8） ---
 
-   public/lens-bg.svg（レンズの虹彩・屈折した光・別次元へ続くグリッド）を画面いっぱいに敷く。
+   public/lens-bg.svg を画面いっぱいに敷く。
    グローバル(src/index.css)の body には足さない。この機能の疑似要素で viewport を覆う。
 
+   ★ここの設計が一度失敗している。
+     v1 は画面全体に周辺減光を掛けて中央を明るく残していた。結果、
+     一番明るい場所（中央）に本文が乗り、しかも色が UI と同じ cyan だったので、
+     タイトルの光彩も ▽ ボタンも背景に溶けた。
+
+     v2 は逆にする。**明るいのは左右の余白、暗いのは本文が乗る中央**。
+     周辺減光をやめて「中央通路」に置き換えた。絵の側も見せ場を左右に寄せてある。
+
    重ねる順（上が手前）:
-     1. 粒子   … 静止画のノイズ。安いタイルの繰り返しにする（大きい feTurbulence は重い）
-     2. 走査線 … CRT ごしに覗いている感じ
-     3. 周辺減光 … 中央に視線を集める
-     4. 減光幕 … 本文を読める明るさまで絵を落とす。ここが無いと絵が勝つ
+     1. 粒子     … 静止画のノイズ。安いタイルの繰り返しにする（大きい feTurbulence は重い）
+     2. 走査線   … CRT ごしに覗いている感じ
+     3. 中央通路 … 本文が乗る帯だけを暗く落とす。視認性はここが全部担う
+     4. 減光幕   … 全体をほんの少しだけ沈める
      5. 絵
-     6. 下地色 … 画像が落ちても真っ黒にならないように */
+     6. 下地色   … 画像が落ちても真っ黒にならないように */
 .bf::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-color: #06080c;
+  /* 中央通路の濃さ。狭い画面では通路が全幅に広がってしまうので、後段の
+     メディアクエリで薄くする（ここだけ変えれば通路 3 か所が同時に動く） */
+  --bf-corridor: 0.91;
+  background-color: #06070f;
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px),
-    radial-gradient(125% 95% at 50% 24%, transparent 44%, rgba(3, 5, 8, 0.78) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.11) 0 1px, transparent 1px 3px),
+    /* 中央通路。本文の列（main は max-width 720px）をまるごと暗く落とす。
+       px 指定なので、画面が狭いと計算結果が負になって左端に寄り、通路が全幅に広がる。
+       広がること自体は正しい（狭い画面では本文も全幅になる）が、そのままだと
+       絵が完全に消えて真っ黒になるので、濃さの方を --bf-corridor で下げる */
     linear-gradient(
-      180deg,
-      rgba(6, 8, 12, 0.26) 0%,
-      rgba(6, 8, 12, 0.44) 58%,
-      rgba(6, 8, 12, 0.66) 100%
-    ),
+        90deg,
+        rgba(2, 3, 9, 0) 0%,
+        rgba(2, 3, 9, calc(var(--bf-corridor) * 0.44)) calc(50% - 520px),
+        rgba(2, 3, 9, var(--bf-corridor)) calc(50% - 372px),
+        rgba(2, 3, 9, var(--bf-corridor)) calc(50% + 372px),
+        rgba(2, 3, 9, calc(var(--bf-corridor) * 0.44)) calc(50% + 520px),
+        rgba(2, 3, 9, 0) 100%
+      ),
+    linear-gradient(180deg, rgba(5, 7, 13, 0.04) 0%, rgba(5, 7, 13, 0.2) 100%),
     url('/lens-bg.svg');
   background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat;
   background-size:
@@ -724,6 +742,19 @@
     center,
     center,
     center top;
+  /* ごくゆっくり漂わせて「覗いている先が生きている」感じを出す。
+     transform だけなのでコンポジタで完結する（再描画は起きない）。
+     scale で 6% 余らせてあるので、translate しても端が出ない */
+  animation: bf-bg-drift 38s ease-in-out infinite alternate;
+}
+
+@keyframes bf-bg-drift {
+  from {
+    transform: scale(1.06) translate3d(-9px, -7px, 0);
+  }
+  to {
+    transform: scale(1.06) translate3d(9px, 7px, 0);
+  }
 }
 
 /* 背景が入ったので、パネルを少しだけ透かして「レンズごしに見ている」ようにする。
@@ -750,4 +781,22 @@
 
 .bf__disclaimer {
   border-top-color: rgba(255, 255, 255, 0.09);
+}
+
+/* 背景の漂いを止める。`.bf::before` の定義より後ろに置かないと打ち消せない。
+   scale は残す（止めた瞬間に絵の大きさが変わらないように） */
+@media (prefers-reduced-motion: reduce) {
+  .bf::before {
+    animation: none;
+    transform: scale(1.06);
+  }
+}
+
+/* 狭い画面では本文が全幅になるため中央通路も全幅に広がる。
+   そのままの濃さだと絵が完全に消えるので薄くする。
+   ちょうどグリッドの消失点あたりが本文の裏に来るので、薄くしても画になる */
+@media (max-width: 860px) {
+  .bf::before {
+    --bf-corridor: 0.72;
+  }
 }
