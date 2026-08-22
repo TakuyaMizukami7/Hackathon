@@ -1,111 +1,150 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" preserveAspectRatio="xMidYMid slice" role="presentation">
   <!--
-    オルタナ▽レンズ の背景アートワーク。
-    中央上に「レンズの虹彩（アイリス）」、下に別次元へ続くグリッド、
-    ペルソナ 4 色（cyan / violet / amber / green）を光としてだけ散らしてある。
+    オルタナ▽レンズ の背景アートワーク（v2）。
 
-    画面に敷くときの減光・粒子・走査線は CSS 側（.bf::before）でやる。
-    ここは「絵」だけを持ち、明るさの調整は持たない。
+    v1 は全体が cyan だったので、UI（タイトルの光彩・▽ ボタン・アクセント）と
+    同じ色味になって手前の要素が背景に溶けていた。v2 は 2 つ変えている。
+
+      1. 支配色を cyan から「マゼンタ ←→ シアン」のデュオトーンに振る。
+         UI が cyan なので、背景の主役は反対側のマゼンタが受け持つ
+      2. 見せ場を左右の余白へ寄せ、中央（本文が乗る帯）は暗いままにする。
+         中央を暗く落とすのは CSS 側の「中央通路」の役目だが、絵の側でも
+         わざわざ中央に明るいものを置かない
+
+    絵の明るさ自体はここで持たない。減光は CSS（.bf::before）でやる。
   -->
   <defs>
-    <radialGradient id="base" cx="50%" cy="32%" r="82%">
-      <stop offset="0%" stop-color="#16232f" />
-      <stop offset="52%" stop-color="#0b1017" />
-      <stop offset="100%" stop-color="#05070a" />
+    <radialGradient id="base" cx="50%" cy="46%" r="86%">
+      <stop offset="0%" stop-color="#05060e" />
+      <stop offset="58%" stop-color="#0a0918" />
+      <stop offset="100%" stop-color="#171033" />
     </radialGradient>
 
+    <radialGradient id="glowMagenta">
+      <stop offset="0%" stop-color="#ff2e88" stop-opacity=".95" />
+      <stop offset="38%" stop-color="#e0219a" stop-opacity=".38" />
+      <stop offset="100%" stop-color="#a21caf" stop-opacity="0" />
+    </radialGradient>
     <radialGradient id="glowCyan">
-      <stop offset="0%" stop-color="#22d3ee" stop-opacity=".64" />
-      <stop offset="42%" stop-color="#22d3ee" stop-opacity=".19" />
-      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0" />
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity=".8" />
+      <stop offset="40%" stop-color="#0ea5e9" stop-opacity=".3" />
+      <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0" />
     </radialGradient>
     <radialGradient id="glowViolet">
-      <stop offset="0%" stop-color="#a855f7" stop-opacity=".44" />
-      <stop offset="100%" stop-color="#a855f7" stop-opacity="0" />
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity=".68" />
+      <stop offset="100%" stop-color="#6d28d9" stop-opacity="0" />
     </radialGradient>
     <radialGradient id="glowAmber">
-      <stop offset="0%" stop-color="#f59e0b" stop-opacity=".28" />
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity=".38" />
       <stop offset="100%" stop-color="#f59e0b" stop-opacity="0" />
     </radialGradient>
-    <radialGradient id="glowGreen">
-      <stop offset="0%" stop-color="#22c55e" stop-opacity=".24" />
-      <stop offset="100%" stop-color="#22c55e" stop-opacity="0" />
-    </radialGradient>
 
-    <!-- 屈折した光の筋。両端を消して「差し込んでいる」ように見せる -->
-    <linearGradient id="streak" x1="0" y1="0" x2="1" y2="0">
+    <!-- 地平線。中央だけ白熱させて左右へ流す -->
+    <linearGradient id="horizon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff2e88" stop-opacity="0" />
+      <stop offset="22%" stop-color="#ff5fa2" stop-opacity=".55" />
+      <stop offset="50%" stop-color="#ffe4f2" stop-opacity=".95" />
+      <stop offset="78%" stop-color="#67e8f9" stop-opacity=".6" />
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- 屈折した光の筋 -->
+    <linearGradient id="streakCyan" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#a5f3fc" stop-opacity="0" />
-      <stop offset="50%" stop-color="#a5f3fc" stop-opacity=".5" />
+      <stop offset="50%" stop-color="#a5f3fc" stop-opacity=".55" />
       <stop offset="100%" stop-color="#a5f3fc" stop-opacity="0" />
     </linearGradient>
-    <linearGradient id="streakViolet" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#e9d5ff" stop-opacity="0" />
-      <stop offset="50%" stop-color="#e9d5ff" stop-opacity=".28" />
-      <stop offset="100%" stop-color="#e9d5ff" stop-opacity="0" />
+    <linearGradient id="streakMagenta" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff8ac0" stop-opacity="0" />
+      <stop offset="50%" stop-color="#ff8ac0" stop-opacity=".5" />
+      <stop offset="100%" stop-color="#ff8ac0" stop-opacity="0" />
     </linearGradient>
 
-    <!-- グリッドは地平線側だけ濃く。上に行くほど消す -->
+    <!-- ▽ の透かしは左右で色を変えて、デュオトーンであることを示す -->
+    <linearGradient id="markDuo" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff2e88" />
+      <stop offset="100%" stop-color="#22d3ee" />
+    </linearGradient>
+
     <linearGradient id="gridFadeGrad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#000" />
-      <stop offset="45%" stop-color="#4a4a4a" />
-      <stop offset="100%" stop-color="#c8c8c8" />
+      <stop offset="38%" stop-color="#6a6a6a" />
+      <stop offset="100%" stop-color="#e6e6e6" />
     </linearGradient>
     <mask id="gridFade">
-      <rect x="0" y="596" width="1440" height="304" fill="url(#gridFadeGrad)" />
+      <rect x="0" y="614" width="1440" height="286" fill="url(#gridFadeGrad)" />
     </mask>
+
+    <filter id="soft" x="-30%" y="-400%" width="160%" height="900%">
+      <feGaussianBlur stdDeviation="14" />
+    </filter>
   </defs>
 
   <rect width="1440" height="900" fill="url(#base)" />
 
-  <!-- 光の玉。ペルソナ 4 色を「光」としてだけ置く -->
-  <ellipse cx="720" cy="270" rx="620" ry="470" fill="url(#glowCyan)" />
-  <ellipse cx="150" cy="830" rx="520" ry="420" fill="url(#glowViolet)" />
-  <ellipse cx="1350" cy="70" rx="420" ry="330" fill="url(#glowAmber)" />
-  <ellipse cx="1320" cy="820" rx="380" ry="300" fill="url(#glowGreen)" />
+  <!-- 光。見せ場は左右の余白（本文は中央に乗るので中央には置かない） -->
+  <ellipse cx="1330" cy="150" rx="560" ry="470" fill="url(#glowCyan)" />
+  <ellipse cx="95" cy="770" rx="600" ry="500" fill="url(#glowMagenta)" />
+  <ellipse cx="1240" cy="880" rx="480" ry="360" fill="url(#glowViolet)" />
+  <ellipse cx="30" cy="90" rx="360" ry="300" fill="url(#glowAmber)" />
 
-  <!-- レンズの虹彩。同心円を外へ行くほど薄くする -->
-  <g fill="none" stroke="#67e8f9" stroke-width="1.25">
-    <circle cx="720" cy="300" r="132" opacity=".32" />
-    <circle cx="720" cy="300" r="198" opacity=".24" />
-    <circle cx="720" cy="300" r="272" opacity=".18" />
-    <circle cx="720" cy="300" r="358" opacity=".13" />
-    <circle cx="720" cy="300" r="455" opacity=".095" />
-    <circle cx="720" cy="300" r="566" opacity=".068" />
-    <circle cx="720" cy="300" r="694" opacity=".046" />
-    <circle cx="720" cy="300" r="838" opacity=".03" />
+  <!-- 主役のレンズ。右上の余白に据える -->
+  <g fill="none" stroke="#a5f3fc">
+    <circle cx="1285" cy="205" r="92" opacity=".5" stroke-width="1.5" />
+    <circle cx="1285" cy="205" r="138" opacity=".36" stroke-width="1.25" />
+    <circle cx="1285" cy="205" r="196" opacity=".26" stroke-width="1.25" />
+    <circle cx="1285" cy="205" r="266" opacity=".17" stroke-width="1" />
+    <circle cx="1285" cy="205" r="348" opacity=".11" stroke-width="1" />
+    <circle cx="1285" cy="205" r="446" opacity=".07" stroke-width="1" />
   </g>
-
-  <!-- 絞り羽根（六角形）。レンズであることを一番わかりやすく示す形 -->
-  <g fill="none" stroke="#a5f3fc" stroke-linejoin="round">
-    <polygon points="720,168 834,234 834,366 720,432 606,366 606,234" opacity=".3" stroke-width="1.5" />
-    <polygon points="720,206 801,253 801,347 720,394 639,347 639,253" opacity=".19" stroke-width="1.25" />
+  <!-- 絞り羽根。レンズであることを一番わかりやすく示す形 -->
+  <g fill="none" stroke="#e0f7ff" stroke-linejoin="round">
+    <polygon points="1285,113 1365,159 1365,251 1285,297 1205,251 1205,159" opacity=".55" stroke-width="1.75" />
+    <polygon points="1285,145 1341,177 1341,233 1285,265 1229,233 1229,177" opacity=".3" stroke-width="1.25" />
   </g>
+  <circle cx="1285" cy="205" r="92" fill="#67e8f9" opacity=".08" />
 
-  <!-- ブランドの ▽ を透かしとして大きく置く -->
-  <polygon points="318,116 1122,116 720,700" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity=".11" />
+  <!-- 対になる小さいレンズ。左下の余白に置いて画面を対角に振る -->
+  <g fill="none" stroke="#ff9ecb">
+    <circle cx="150" cy="700" r="62" opacity=".45" stroke-width="1.5" />
+    <circle cx="150" cy="700" r="98" opacity=".3" stroke-width="1.25" />
+    <circle cx="150" cy="700" r="146" opacity=".19" stroke-width="1" />
+    <circle cx="150" cy="700" r="208" opacity=".11" stroke-width="1" />
+  </g>
+  <polygon points="150,638 204,669 204,731 150,762 96,731 96,669" fill="none" stroke="#ffd6ea" stroke-width="1.5" stroke-linejoin="round" opacity=".4" />
 
-  <!-- 屈折。レンズを横切る光の筋 -->
+  <!-- ブランドの ▽。左右で色が変わる -->
+  <polygon points="256,96 1184,96 720,712" fill="none" stroke="url(#markDuo)" stroke-width="2" opacity=".16" />
+
+  <!-- 屈折。画面を斜めに横切る光 -->
   <g>
-    <rect x="-160" y="286" width="1760" height="2.2" fill="url(#streak)" opacity=".55" transform="rotate(-13 720 300)" />
-    <rect x="-160" y="316" width="1760" height="1.1" fill="url(#streak)" opacity=".3" transform="rotate(-13 720 300)" />
-    <rect x="-160" y="540" width="1760" height="1.4" fill="url(#streakViolet)" opacity=".5" transform="rotate(7 720 540)" />
+    <rect x="-200" y="238" width="1840" height="2.4" fill="url(#streakCyan)" opacity=".6" transform="rotate(-15 720 240)" />
+    <rect x="-200" y="272" width="1840" height="1.1" fill="url(#streakCyan)" opacity=".3" transform="rotate(-15 720 240)" />
+    <rect x="-200" y="596" width="1840" height="2" fill="url(#streakMagenta)" opacity=".55" transform="rotate(9 720 596)" />
   </g>
 
-  <!-- 別次元へ続くグリッド。消失点はレンズの真下 -->
-  <g mask="url(#gridFade)" fill="none" stroke="#22d3ee" stroke-width="1" opacity=".66">
-    <path d="M720 620 L-460 900 M720 620 L-160 900 M720 620 L110 900 M720 620 L330 900 M720 620 L505 900 M720 620 L640 900 M720 620 L800 900 M720 620 L935 900 M720 620 L1110 900 M720 620 L1330 900 M720 620 L1600 900 M720 620 L1900 900" />
-    <path d="M0 646h1440 M0 664h1440 M0 688h1440 M0 719h1440 M0 760h1440 M0 812h1440 M0 878h1440" />
+  <!-- 別次元へ続くグリッド。マゼンタで、UI の cyan とはっきり分ける -->
+  <g mask="url(#gridFade)" fill="none" stroke="#ff5ba8" stroke-width="1.2" opacity="1">
+    <path d="M720 614 L-560 900 M720 614 L-230 900 M720 614 L40 900 M720 614 L268 900 M720 614 L458 900 M720 614 L614 900 M720 614 L826 900 M720 614 L982 900 M720 614 L1172 900 M720 614 L1400 900 M720 614 L1670 900 M720 614 L2000 900" />
+    <path d="M0 642h1440 M0 662h1440 M0 688h1440 M0 722h1440 M0 767h1440 M0 825h1440 M0 897h1440" />
   </g>
 
-  <!-- 遠くの塵。数を絞って、いるかいないか分からない程度に -->
+  <!-- 地平線。ここが一番明るい。グリッドの起点だと一目でわかる -->
+  <rect x="0" y="607" width="1440" height="14" fill="url(#horizon)" opacity=".8" filter="url(#soft)" />
+  <rect x="0" y="613" width="1440" height="1.6" fill="url(#horizon)" />
+
+  <!-- 遠くの塵 -->
+  <g fill="#ffd9ec">
+    <circle cx="322" cy="196" r="1.7" opacity=".5" />
+    <circle cx="1088" cy="132" r="1.4" opacity=".42" />
+    <circle cx="248" cy="474" r="1.5" opacity=".38" />
+    <circle cx="86" cy="318" r="1.4" opacity=".3" />
+    <circle cx="392" cy="806" r="1.6" opacity=".34" />
+  </g>
   <g fill="#a5f3fc">
-    <circle cx="322" cy="196" r="1.6" opacity=".5" />
-    <circle cx="1088" cy="152" r="1.3" opacity=".4" />
-    <circle cx="1216" cy="392" r="1.8" opacity=".3" />
-    <circle cx="248" cy="474" r="1.4" opacity=".35" />
-    <circle cx="944" cy="536" r="1.2" opacity=".3" />
-    <circle cx="512" cy="118" r="1.2" opacity=".3" />
-    <circle cx="1364" cy="266" r="1.5" opacity=".25" />
-    <circle cx="86" cy="318" r="1.3" opacity=".28" />
+    <circle cx="1216" cy="392" r="1.9" opacity=".38" />
+    <circle cx="944" cy="98" r="1.3" opacity=".34" />
+    <circle cx="1382" cy="486" r="1.5" opacity=".3" />
+    <circle cx="1060" cy="330" r="1.2" opacity=".28" />
   </g>
 </svg>
