@@ -14,8 +14,8 @@ type Status = 'idle' | 'loading' | 'done' | 'error'
  * オルタナ▽レンズ の画面。
  *
  * 待ち時間を「間」にしないのがここの肝。
- * loading 中もペルソナ名つきのドロップダウンを 4 つ先に描き、
- * 本文にあたる部分では 4 人がそれぞれの性格で考え込む（PerspectiveItem 側）。
+ * loading 中もペルソナ名つきのドロップダウンを 5 つ先に描き、
+ * 本文にあたる部分では 5 人がそれぞれの性格で考え込む（PerspectiveItem 側）。
  */
 export function BiasFilter() {
   // デモは必ず空欄から始める。初期値を入れておくと
@@ -70,7 +70,7 @@ export function BiasFilter() {
       <header className="bf__header">
         <h1 className="bf__title">オルタナ▽レンズ</h1>
         <p className="bf__lead">
-          ひとつの出来事を、4 人の偏った語り手が同時に解説する。事実は 1 つ、解釈は 4 つ。
+          ひとつの出来事を、5 人の偏った語り手が同時に解説する。事実は 1 つ、解釈は 5 つ。
         </p>
       </header>
 
@@ -127,7 +127,7 @@ export function BiasFilter() {
             // 要約が入る場所に、そのまま進捗を置く。グレーの棒を 1 本増やさない
             <div className="bf__thinking">
               <span className="bf__thinking-label">
-                4 人が考えています
+                5 人が考えています
                 {/* 0.1 秒ごとに変わるので読み上げからは外す */}
                 <span className="bf__thinking-secs" aria-hidden="true">
                   {(elapsedMs / 1000).toFixed(1)}s

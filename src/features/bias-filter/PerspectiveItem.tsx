@@ -11,11 +11,30 @@ import {
 } from './thinking'
 
 /**
+ * Markdown の `**太字**` だけを `<strong>` に変換する。
+ * それ以外の記法は解釈しない最小限の実装（フルの Markdown パーサは使わない）。
+ * headline/body は AI が生成した文字列を React の子要素として展開するだけなので、
+ * ここでも文字列を組み立てるだけで dangerouslySetInnerHTML は使わない（XSS 経路を増やさない）。
+ */
+function renderWithEmphasis(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g)
+  return parts.map((part, i) =>
+    part.startsWith('**') && part.endsWith('**') ? (
+      <strong key={i} className="bf-item__emphasis">
+        {part.slice(2, -2)}
+      </strong>
+    ) : (
+      part
+    ),
+  )
+}
+
+/**
  * ペルソナ 1 人分のドロップダウン。
  * 中身(perspective)が無いときは、名前と「考え中の独り言」だけを出す。
  * ローディング中もペルソナ名を先に出せるのがこの設計の狙い。
  *
- * 開閉は排他にしない。4 つ同時に開いて見比べるのがこのアプリの見せ場。
+ * 開閉は排他にしない。5 つ同時に開いて見比べるのがこのアプリの見せ場。
  */
 export function PerspectiveItem({
   id,
@@ -66,7 +85,7 @@ export function PerspectiveItem({
             {meta.label}
           </span>
           {ready ? (
-            <span className="bf-item__headline">{perspective.headline}</span>
+            <span className="bf-item__headline">{renderWithEmphasis(perspective.headline)}</span>
           ) : thinking ? (
             // key を付け替えることで、行が変わるたびにフェードインを 1 回だけ流し直す
             <span className="bf-item__headline bf-item__thinking">
@@ -96,7 +115,7 @@ export function PerspectiveItem({
         <div className="bf-item__body" data-open={open}>
           <div className="bf-item__body-clip">
             <div className="bf-item__body-inner">
-              <p className="bf-item__text">{perspective.body}</p>
+              <p className="bf-item__text">{renderWithEmphasis(perspective.body)}</p>
               <div className="bf-item__meta">
                 <span
                   className="bf-item__bias"

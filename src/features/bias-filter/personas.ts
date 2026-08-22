@@ -20,6 +20,7 @@ export const PERSONA_META: Record<PersonaId, PersonaMeta> = {
   conspiracist: { label: '陰謀を疑う人', emoji: '🕶️', color: '#a855f7' },
   historian2125: { label: '100年後の歴史家', emoji: '📜', color: '#38bdf8' },
   realist_investor: { label: '現実主義の投資家', emoji: '📈', color: '#22c55e' },
+  alien_invader: { label: '過激派宇宙人', emoji: '👽', color: '#ef4444' },
 }
 
 /** 入力の上限。BE 側のバリデーションと同じ値にすること */

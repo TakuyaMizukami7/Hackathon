@@ -108,8 +108,8 @@ const EXPAND_SCHEMA: Schema = {
     perspectives: {
       type: Type.ARRAY,
       items: PERSPECTIVE_SCHEMA,
-      minItems: '4',
-      maxItems: '4',
+      minItems: '5',
+      maxItems: '5',
     },
   },
   required: ['summary', 'perspectives'],

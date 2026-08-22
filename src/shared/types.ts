@@ -54,7 +54,8 @@ export type ApiError = {
  * 表示名・絵文字・色といった見た目のメタはフロント側の定数
  * (src/features/bias-filter/personas.ts) が持つ。
  */
-export type PersonaId = 'optimist' | 'conspiracist' | 'historian2125' | 'realist_investor'
+export type PersonaId =
+  'optimist' | 'conspiracist' | 'historian2125' | 'realist_investor' | 'alien_invader'
 
 /** 表示順。API のレスポンスもこの順で返る */
 export const PERSONA_IDS: PersonaId[] = [
@@ -62,6 +63,7 @@ export const PERSONA_IDS: PersonaId[] = [
   'conspiracist',
   'historian2125',
   'realist_investor',
+  'alien_invader',
 ]
 
 /** 1ペルソナ分の解説 */
