@@ -37,6 +37,11 @@ export type HealthResponse = {
   commit: string
   /** LLM の API キーがサーバーに設定されているか */
   hasApiKey: boolean
+  /**
+   * 環境変数 LLM_MODEL で設定されている本命モデル名（未設定ならコード側の既定値）。
+   * 実際に Gemini を呼ばずに確認できる。事故対応でモデル切替が反映されたかの確認用
+   */
+  model: string
 }
 
 /** API がエラーを返すときの共通形 */
