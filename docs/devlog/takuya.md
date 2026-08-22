@@ -4,6 +4,29 @@
 
 ---
 
+## 2026-08-22 — Bias Filter ▽ の実装プランと Issue 8 件を用意
+
+- **やったこと**: [docs/PLAN_BIAS_FILTER.md](../PLAN_BIAS_FILTER.md) を追加（#3 でマージ済み）。
+  API 契約・MVP 仕分け・時間割・プロンプト設計をまとめ、GitHub に Issue #4〜#11 を登録
+- **決めたこと**:
+  - **ペルソナのカタログはフロント側の定数で固定**し、AI には中身だけを埋めさせる。
+    これでフロントは API 完成前に UI を作り切れ、ローディング中もペルソナ名を先に出せる
+  - **`POST /api/expand?mock=1` を最初に作る**。2 人が互いに待たないための生命線。
+    本番でも残し、当日 Gemini が落ちたときのデモの保険にする
+  - JSON は `response_schema`（Pydantic / responseSchema）で強制する。
+    プロンプトで「JSON で返して」と頼むだけの実装はコードフェンスで必ず壊れる
+  - 関門は 3 つ: 0:20 types.ts 凍結 / 0:40 デプロイ済み / 2:30 コードフリーズ
+- **未決**: **バックエンドを FastAPI 新規にするか、既存 Hono に `/api/expand` を足すか。**
+  当日の開始 10 分以内に 2 人で決める。既存 Hono ならデプロイ・CI・503 リトライを
+  流用できて BE-1 が 15 分で終わる（FastAPI 新規は 45〜60 分）。プラン冒頭に比較表あり
+- **次やること**: Railway の初期設定（`GEMINI_API_KEY` 投入 → `/api/health` の `hasApiKey`）。
+  実キーでの `gemini-3.7-flash` 疎通確認は依然として未検証
+- **相方への申し送り**: **`src/shared/types.ts` はまだ触っていない。** 当日 0:20 までに
+  BE 担当が `PersonaId` / `PERSONA_IDS` / `Perspective` / `ExpandRequest` / `ExpandResponse` を
+  **追加のみ**で入れて即マージする。確定形はプランの 1-3 にそのまま貼れる形で書いてある
+
+---
+
 ## 2026-08-21 — /api/chat の 503(混雑) 対策
 
 - **やったこと**: `server/routes/chat.ts` にリトライ + モデルのフォールバックを実装。
