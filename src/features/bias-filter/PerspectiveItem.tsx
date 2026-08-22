@@ -4,10 +4,18 @@ import { PERSONA_META } from './personas'
 
 /**
  * ペルソナ 1 人分のドロップダウン。
- * 中身(perspective)が無いときは、名前だけ出して「生成中…」を表示する。
+ * 中身(perspective)が無いときは、名前だけ出して見出しをスケルトンにする。
  * ローディング中もペルソナ名を先に出せるのがこの設計の狙い。
  */
-export function PerspectiveItem({ id, perspective }: { id: PersonaId; perspective?: Perspective }) {
+export function PerspectiveItem({
+  id,
+  perspective,
+  loading = false,
+}: {
+  id: PersonaId
+  perspective?: Perspective
+  loading?: boolean
+}) {
   const [open, setOpen] = useState(false)
   const meta = PERSONA_META[id]
   const ready = perspective !== undefined
@@ -28,7 +36,15 @@ export function PerspectiveItem({ id, perspective }: { id: PersonaId; perspectiv
           <span className="bf-item__persona" style={{ color: meta.color }}>
             {meta.label}
           </span>
-          <span className="bf-item__headline">{ready ? perspective.headline : '生成中…'}</span>
+          {ready ? (
+            <span className="bf-item__headline">{perspective.headline}</span>
+          ) : loading ? (
+            <span className="bf-item__headline bf-item__skeleton" aria-label="生成中" />
+          ) : (
+            <span className="bf-item__headline bf-item__headline--empty">
+              この視点は返ってきませんでした
+            </span>
+          )}
         </span>
         <span className="bf-item__caret" aria-hidden="true">
           ▽

@@ -4,6 +4,38 @@
 
 ---
 
+## 2026-08-22 — FE-2 API 連携（/api/expand）と待ち時間のスケルトン
+
+- **やったこと**: `src/features/bias-filter/api.ts` を追加（[#5](https://github.com/TakuyaMizukami7/Hackathon/issues/5)）。
+  `expand(text, { mock, signal })` で `POST /api/expand` を叩く。`BiasFilter.tsx` は
+  `idle / loading / done / error` の 4 状態だけを `useState` で持つ。
+  loading 中もペルソナ名つきの空アコーディオンを 4 つ描き、見出しだけ pulse スケルトンにする
+- **決めたこと**:
+  - **`api.ts` は `src/shared/api.ts` ではなく機能ディレクトリに置いた**。共有ファイルの
+    コンフリクトを避けるため。shared 側は health / chat のまま触っていない
+  - **`?mock=` は 3 値**。`off`（本番）/ `1`→`server`（BE の `/api/expand?mock=1` を叩く）/
+    `local`（ブラウザ内の MOCK_RESPONSE を 1.5 秒待って返す・通信ゼロ）。
+    `local` は **BE-1 が未着手でも画面の動きを確認できる逃げ道**で、当日 BE が落ちたときの保険にもなる
+  - エラー本文は `res.text()` してから JSON を試す。BE 未実装だと HTML の 404 が返るので、
+    `res.json()` だと画面が別のエラーで壊れる
+  - 連打防止は `useRef<AbortController>`。アンマウント時は abort して setState しない
+  - 4 件揃わずに返ってきたペルソナは「この視点は返ってきませんでした」を出す（レイアウトは崩さない）
+- **検証済み**: スタブサーバー相手に `expand()` を 10 ケース（`?mock=` の解釈 / 成功 /
+  サーバーの `error` 文の素通し / HTML 404 / abort / サーバー停止）。
+  `PerspectiveList` を SSR して loading 時にペルソナ名 4 つ + スケルトン 4 本が出ることを確認。
+  `npm run check` と `npm run build` は通っている
+- **未検証**: **ブラウザでの目視**と、**実際の `/api/expand?mock=1` との疎通**（BE-1 が未着手のため）。
+  → [#14](https://github.com/TakuyaMizukami7/Hackathon/issues/14) に切り出した
+- **次やること**: FE-3（アコーディオンのアニメーション）。BE-1 が入ったら #14 の疎通確認
+- **相方への申し送り**:
+  - **バックエンドは FastAPI に決定（[#15](https://github.com/TakuyaMizukami7/Hackathon/issues/15)）。
+    `vite.config.ts` の proxy を `http://localhost:8000` に変えた。**
+    既存の Hono(3000) はもう `/api/*` を受け取らないので、開発中は uvicorn を 8000 で起動すること。
+    `npm run dev:api`（Hono）と Railway の start コマンドの差し替えは BE-1
+    ([#8](https://github.com/TakuyaMizukami7/Hackathon/issues/8)) 側でお願いしたい
+  - フロントは `POST /api/expand` に `{ text }` を投げ、`?mock=1` が付いたら固定応答を期待する。
+    エラーは **HTTP ステータス + `{ error: string }`** で返してほしい（その文をそのまま画面に出す）
+
 ## 2026-08-22 — FE-1 ペルソナ定数とモック駆動の UI 骨組み
 
 - **やったこと**: `src/features/bias-filter/` に FE-1 一式（[#4](https://github.com/TakuyaMizukami7/Hackathon/issues/4) / PR #13）。
