@@ -3,6 +3,7 @@ import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import { chat } from './routes/chat'
+import { expand } from './routes/expand'
 import { health } from './routes/health'
 
 /**
@@ -20,6 +21,7 @@ const app = new Hono()
 // --- API ルート（1 エンドポイント = 1 ファイル = 1 人が所有）---
 app.route('/api/health', health)
 app.route('/api/chat', chat)
+app.route('/api/expand', expand)
 
 // --- フロントの配信 ---
 const distIndex = './dist/index.html'
