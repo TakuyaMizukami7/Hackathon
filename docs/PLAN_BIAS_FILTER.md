@@ -240,16 +240,16 @@ FE は常に `fetch('/api/expand')` と書く。dev も本番も同じコード�
 
 GitHub に登録済み。**担当ディレクトリは重ねない。**
 
-| # | 担当 | タイトル | ディレクトリ |
+| # | 担当 | Issue | ディレクトリ |
 | --- | --- | --- | --- |
-| FE-1 | フロント | ペルソナ定数とモック駆動の UI 骨組み | `src/features/bias-filter/` |
-| FE-2 | フロント | API 連携と 3 状態の管理 | 同上 |
-| FE-3 | フロント | 「▽ 展開」の演出とアコーディオンのアニメーション | 同上 |
-| FE-4 | フロント | デモ用の仕上げ | 同上 + `index.html` |
-| BE-1 | バック | サーバー雛形 + モック応答 + Railway デプロイ ★最優先 | `api/` or `server/routes/` |
-| BE-2 | バック | Gemini 組み込みと JSON 構造化出力 | 同上 |
-| BE-3 | バック | プロンプトエンジニアリング（バイアスを濃くする） | 同上 |
-| BE-4 | バック | 本番デプロイと事故対策 | 同上 |
+| FE-1 | フロント | [#4 ペルソナ定数とモック駆動の UI 骨組み](https://github.com/TakuyaMizukami7/Hackathon/issues/4) | `src/features/bias-filter/` |
+| FE-2 | フロント | [#5 API 連携と状態管理](https://github.com/TakuyaMizukami7/Hackathon/issues/5) | 同上 |
+| FE-3 | フロント | [#6 展開の演出とアニメーション](https://github.com/TakuyaMizukami7/Hackathon/issues/6) | 同上 |
+| FE-4 | フロント | [#7 デモ用の仕上げ](https://github.com/TakuyaMizukami7/Hackathon/issues/7) | 同上 + `index.html` |
+| BE-1 | バック | [#8 サーバー雛形 + モック応答 + デプロイ【最優先】](https://github.com/TakuyaMizukami7/Hackathon/issues/8) | `api/` or `server/routes/` |
+| BE-2 | バック | [#9 Gemini 組み込みと JSON 構造化出力](https://github.com/TakuyaMizukami7/Hackathon/issues/9) | 同上 |
+| BE-3 | バック | [#10 プロンプトエンジニアリング](https://github.com/TakuyaMizukami7/Hackathon/issues/10) | 同上 |
+| BE-4 | バック | [#11 本番デプロイと事故対策](https://github.com/TakuyaMizukami7/Hackathon/issues/11) | 同上 |
 
 ---
 
