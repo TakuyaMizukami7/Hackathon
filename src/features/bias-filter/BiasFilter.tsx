@@ -4,6 +4,7 @@ import { PerspectiveList } from './PerspectiveList'
 import { MAX_TEXT_LENGTH } from './personas'
 import { SAMPLE_INPUTS } from './samples'
 import { expand, readMockMode } from './api'
+import { LONG_WAIT_MS, useElapsedMs } from './thinking'
 import './bias-filter.css'
 
 /** 画面の状態はこの 4 つだけ。状態管理ライブラリは入れない */
@@ -14,7 +15,7 @@ type Status = 'idle' | 'loading' | 'done' | 'error'
  *
  * 待ち時間を「間」にしないのがここの肝。
  * loading 中もペルソナ名つきのドロップダウンを 4 つ先に描き、
- * 本文にあたる部分だけスケルトンにする（PerspectiveItem 側）。
+ * 本文にあたる部分では 4 人がそれぞれの性格で考え込む（PerspectiveItem 側）。
  */
 export function BiasFilter() {
   // デモは必ず空欄から始める。初期値を入れておくと
@@ -23,6 +24,8 @@ export function BiasFilter() {
   const [status, setStatus] = useState<Status>('idle')
   const [result, setResult] = useState<ExpandResponse | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
+  /** 実行を開始した時刻(performance.now())。経過秒数の表示に使う */
+  const [startedAt, setStartedAt] = useState<number | null>(null)
 
   /** `?mock=` の判定は起動時に 1 回だけ */
   const [mock] = useState(readMockMode)
@@ -35,6 +38,10 @@ export function BiasFilter() {
   const loading = status === 'loading'
   const empty = text.trim().length === 0
 
+  // 進捗率は API から取れない。代わりに経過秒数を隠さず出して「止まっていない」ことを見せる
+  const elapsedMs = useElapsedMs(loading ? startedAt : null)
+  const longWait = loading && elapsedMs >= LONG_WAIT_MS
+
   async function run(input: string) {
     if (inFlight.current) return // 連打しても 2 本目は飛ばさない
     const controller = new AbortController()
@@ -43,6 +50,7 @@ export function BiasFilter() {
     setStatus('loading')
     setErrorMessage('')
     setResult(null)
+    setStartedAt(performance.now())
 
     try {
       const response = await expand(input, { mock, signal: controller.signal })
@@ -116,7 +124,22 @@ export function BiasFilter() {
           {result ? (
             <p className="bf__summary">{result.summary}</p>
           ) : (
-            <p className="bf__summary bf__summary--skeleton" aria-hidden="true" />
+            // 要約が入る場所に、そのまま進捗を置く。グレーの棒を 1 本増やさない
+            <div className="bf__thinking">
+              <span className="bf__thinking-label">
+                4 人が考えています
+                {/* 0.1 秒ごとに変わるので読み上げからは外す */}
+                <span className="bf__thinking-secs" aria-hidden="true">
+                  {(elapsedMs / 1000).toFixed(1)}s
+                </span>
+              </span>
+              <span className="bf__thinking-bar" aria-hidden="true" />
+              {longWait && (
+                <span className="bf__thinking-note" role="status">
+                  混み合っています。もう少しかかります
+                </span>
+              )}
+            </div>
           )}
           <PerspectiveList perspectives={result?.perspectives ?? []} loading={loading} />
         </div>

@@ -196,64 +196,7 @@
   padding: 0.05rem 0.55rem;
 }
 
-/* --- 待ち時間とエラー（FE-2） --- */
-
-/* 本文が来る前の場所取り。pulse でここが「これから埋まる」ことを見せる */
-.bf__summary--skeleton,
-.bf-item__skeleton {
-  display: block;
-  border-radius: 4px;
-  background: linear-gradient(90deg, var(--line), #3a3d49, var(--line));
-  background-size: 200% 100%;
-  animation: bf-pulse 1.2s ease-in-out infinite;
-}
-
-.bf__summary--skeleton {
-  width: 62%;
-  height: 0.9em;
-}
-
-.bf-item__skeleton {
-  width: 45%;
-  height: 1em;
-  margin: 0.2em 0;
-}
-
-/* 幅を少しずつ変えて、4 本が同時に光る「機械っぽさ」を減らす */
-.bf-item:nth-child(2) .bf-item__skeleton {
-  width: 58%;
-  animation-delay: 0.15s;
-}
-.bf-item:nth-child(3) .bf-item__skeleton {
-  width: 50%;
-  animation-delay: 0.3s;
-}
-.bf-item:nth-child(4) .bf-item__skeleton {
-  width: 64%;
-  animation-delay: 0.45s;
-}
-
-@keyframes bf-pulse {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bf__summary--skeleton,
-  .bf-item__skeleton,
-  .bf-item--in {
-    animation: none;
-  }
-
-  .bf-item__body,
-  .bf-item__caret {
-    transition: none;
-  }
-}
+/* --- 待ち時間とエラー（FE-2 / 演出は FE-5 で差し替え） --- */
 
 .bf-item__headline--empty {
   color: var(--muted);
@@ -365,4 +308,181 @@
   color: var(--muted);
   font-size: 0.78rem;
   line-height: 1.6;
+}
+
+/* --- 待ち時間の演出（FE-5 / Issue #26） ---
+
+   ここは「読み込み中です」を綺麗に見せる場所ではなく、
+   結果が返るまでの数秒で 4 人の性格を伝えてしまうための場所。
+   グレーのスケルトンは全部やめて、独り言・点・左端の明滅に置き換えた。 */
+
+/* 要約が入る予定の行に、そのまま進捗を置く（.bf__summary と同じ余白） */
+.bf__thinking {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.5rem 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.bf__thinking-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex: none;
+}
+
+/* 秒数は等幅にしないと 1 桁 → 2 桁で行が揺れる */
+.bf__thinking-secs {
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 不定形バー。進捗率は API から取れないので「率」は出さない */
+.bf__thinking-bar {
+  position: relative;
+  flex: 1;
+  min-width: 80px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.bf__thinking-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 30%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: bf-sweep 1.5s ease-in-out infinite;
+}
+
+@keyframes bf-sweep {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(440%);
+  }
+}
+
+/* 8 秒を超えたときだけ出るフォロー。Gemini の 503 リトライ中でも「壊れた」に見せない */
+.bf__thinking-note {
+  flex-basis: 100%;
+  font-size: 0.8rem;
+  animation: bf-fade 320ms ease both;
+}
+
+/* ペルソナ 1 人分の「考え中」。高さを headline と揃えて、
+   本物の見出しが入った瞬間に行がずれないようにする */
+.bf-item__thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* 行が変わるたびに key が変わり、このフェードインが 1 回だけ流れる */
+.bf-item__thinking-line {
+  animation: bf-fade 320ms ease both;
+}
+
+@keyframes bf-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* タイピングインジケータ。色はペルソナ色 */
+.bf-item__dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+}
+
+.bf-item__dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--bf-persona, currentColor);
+  animation: bf-dot 1.1s ease-in-out infinite;
+}
+
+.bf-item__dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.bf-item__dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes bf-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+/* 左端のカラーバーを明滅させる。4 件を少しずつずらして「順番に考えている」ように見せる。
+   border-left-color はインラインスタイルで指定しているが、
+   アニメーションの方が優先されるので上書きできる */
+.bf-item--thinking {
+  animation: bf-edge 1.8s ease-in-out infinite;
+}
+
+.bf-item--thinking:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.bf-item--thinking:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.bf-item--thinking:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+@keyframes bf-edge {
+  0%,
+  100% {
+    border-left-color: var(--line);
+  }
+  50% {
+    border-left-color: var(--bf-persona);
+  }
+}
+
+/* 動きを減らす設定のときは、独り言の入れ替えも JS 側で止めている（thinking.ts）。
+   ここでは点滅とスライドだけ消して、文字とペルソナ色は残す */
+@media (prefers-reduced-motion: reduce) {
+  .bf-item--in,
+  .bf-item--thinking,
+  .bf-item__thinking-line,
+  .bf-item__dots i,
+  .bf__thinking-note {
+    animation: none;
+  }
+
+  .bf__thinking-bar {
+    display: none;
+  }
+
+  .bf-item__body,
+  .bf-item__caret {
+    transition: none;
+  }
 }
