@@ -4,6 +4,30 @@
 
 ---
 
+## 2026-08-22 — proxy を Hono(3000) に戻し、/api/expand と実疎通した
+
+- **やったこと**: `vite.config.ts` の proxy 先を `http://localhost:8000` から
+  **`http://localhost:3000` に戻した**。FE-2（#17）で一度 FastAPI 前提の 8000 に変えてしまったが、
+  バックエンドは**既存 Hono を拡張する方針で確定**しており、相方の BE-1（#16）が
+  `server/routes/expand.ts` として既にマージ済みだった
+- **やらかし**: BE の方式が未決だと思い込んで proxy を書き換えた。
+  **共有ファイル（`vite.config.ts`）を触る前に `git log` と相方の devlog を見れば防げた。**
+  #15 は「FastAPI 採用」として閉じてしまったので、訂正コメントを入れて閉じ直した
+- **検証済み（ようやく実物と）**: `npm run dev` の Vite proxy 越しに
+  - `POST /api/expand?mock=1` → **200 / 4 件 / PERSONA_IDS と同じ順 / 1.56 秒**（モックの 1.5 秒待ち込み）
+  - `?mock=1` なし → **501** `{"error":"モック以外の応答は未実装です(BE-2 で対応予定)"}`
+  - 空文字 / 401 文字 → **400** `{"error":"text は 1〜400 文字で入力してください"}`
+  - `GET /api/health` → 200
+  エラーは全部 `{ error: string }` なので、FE はその文をそのまま赤枠に出せる。契約は一致している
+- **環境メモ**: このマシンでは `npm run dev` の `dev:api`（`tsx watch`）が
+  何も出さずに listen しないことがある。`npx tsx server/index.ts` なら普通に 3000 で上がる
+- **未検証**: **ブラウザでの目視だけが残っている**（[#14](https://github.com/TakuyaMizukami7/Hackathon/issues/14)）。
+  API 疎通の分は消化したので #14 はチェックを減らしてある
+- **次やること**: FE-3（アコーディオンのアニメーション / #6）
+- **相方への申し送り**:
+  - **proxy は 3000。`npm run dev` だけで web(5173) と api(3000) が両方上がる。**追加の起動は要らない
+  - BE-2 に入ったら `?mock=1` なしの 501 が本物の応答に変わる。FE 側は何も変えなくてよい
+
 ## 2026-08-22 — FE-2 API 連携（/api/expand）と待ち時間のスケルトン
 
 - **やったこと**: `src/features/bias-filter/api.ts` を追加（[#5](https://github.com/TakuyaMizukami7/Hackathon/issues/5)）。
@@ -28,11 +52,9 @@
   → [#14](https://github.com/TakuyaMizukami7/Hackathon/issues/14) に切り出した
 - **次やること**: FE-3（アコーディオンのアニメーション）。BE-1 が入ったら #14 の疎通確認
 - **相方への申し送り**:
-  - **バックエンドは FastAPI に決定（[#15](https://github.com/TakuyaMizukami7/Hackathon/issues/15)）。
-    `vite.config.ts` の proxy を `http://localhost:8000` に変えた。**
-    既存の Hono(3000) はもう `/api/*` を受け取らないので、開発中は uvicorn を 8000 で起動すること。
-    `npm run dev:api`（Hono）と Railway の start コマンドの差し替えは BE-1
-    ([#8](https://github.com/TakuyaMizukami7/Hackathon/issues/8)) 側でお願いしたい
+  - ~~バックエンドは FastAPI に決定。`vite.config.ts` の proxy を 8000 に変えた~~
+    → **これは誤り。** 実際は既存 Hono を拡張する方針で確定していた（BE-1 は #16 でマージ済み）。
+    proxy は 3000 に戻した。詳細は一番上のエントリを見ること
   - フロントは `POST /api/expand` に `{ text }` を投げ、`?mock=1` が付いたら固定応答を期待する。
     エラーは **HTTP ステータス + `{ error: string }`** で返してほしい（その文をそのまま画面に出す）
 
