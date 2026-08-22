@@ -4,6 +4,19 @@
 
 ---
 
+## 2026-08-22 — BE-2/BE-3/BE-4: Gemini組み込み・プロンプト・デプロイ堅牢化(並行実装)
+
+- **やったこと**: BE-2/BE-3/BE-4(Issue #9/#10/#11)を、3つのgit worktree+並行AIエージェントで同時実装した。
+  - **事前準備**: `server/prompts/expand.ts` を空の契約(`SYSTEM_PROMPT` / `buildUserPrompt()`)だけ先にmainへマージし、BE-2とBE-3が同じファイルで待ち合わせずに並行実装できるようにした(#19)
+  - **BE-3**: `server/prompts/expand.ts` の中身を実装。両論併記を禁止し4ペルソナが矛盾するようにする禁止事項ベースのシステムプロンプトと、`text`/`summary`/`perspectives` を組み立てるユーザープロンプトを実装(#20)
+  - **BE-2**: `server/lib/gemini.ts` を新規作成。`chat.ts` の503リトライ・モデルフォールバックのパターンを非ストリーミング版として移植し、`responseSchema` でJSON構造化出力を強制。`server/routes/expand.ts` の未実装(501)部分をこの呼び出しに置き換えた(#21)
+  - **BE-4**: `docs/DEPLOY.md` に予備キー切替手順・事故対応チェックリストを追記。`GET /api/health` に `model` フィールドを追加(`HealthResponse` に追記のみ、既存フィールドは無変更)(#22)
+- **決めたこと**: 並行開発でのコンフリクトを避けるため、BE-2は`server/routes/expand.ts`+`server/lib/gemini.ts`、BE-3は`server/prompts/expand.ts`の中身のみ、BE-4はコードにほぼ触れずRailway運用ドキュメントを中心に担当を分割した。3ブランチとも `main` に対してほぼコンフリクトなくrebase・マージできた
+- **検証済み**: ローカルで実際にGemini APIを呼び出し `POST /api/expand`(mockなし)を確認。4ペルソナ(optimist/conspiracist/historian2125/realist_investor)が明確に矛盾する内容を返すことを確認。`GET /api/health` に `model` フィールドが反映されていることも確認
+- **未検証**: Railway本番URLでの `/api/expand`(実応答)の疎通確認。`GEMINI_API_KEY` の予備キーは未発行
+- **次やること**: 本番デプロイ後に `docs/DEPLOY.md` のチェックリストに沿って本番疎通確認を行う
+- **相方への申し送り**: `src/shared/types.ts` の `HealthResponse` に `model: string` を追加した(既存フィールドの変更・削除はなし)。フロント側で `HealthResponse` を型キャストのみで使っている箇所は影響なしのはず
+
 ## 2026-08-22 — BE-1: サーバー雛形 + モック応答
 
 - **やったこと**: `server/routes/expand.ts` を新規作成し `server/index.ts` に1行だけ登録。
