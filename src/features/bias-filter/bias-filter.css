@@ -108,13 +108,45 @@
 .bf-item__caret {
   color: var(--muted);
   font-size: 0.9rem;
+  /* inline のままだと transform が効かない */
+  display: inline-block;
+  transition:
+    transform 240ms ease,
+    color 240ms ease;
 }
 
 .bf-item__head[aria-expanded='true'] .bf-item__caret {
   color: var(--fg);
+  transform: rotate(180deg);
 }
 
 .bf-item__body {
+  /* 高さ auto を滑らかに開くための 0fr -> 1fr。max-height のハックは閉じるときにカクつくので使わない */
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 240ms ease;
+}
+
+.bf-item__body[data-open='true'] {
+  grid-template-rows: 1fr;
+}
+
+/* 高さ 0 のときにはみ出さないための蓋。padding はこの内側(-inner)に置く。
+   ここに padding を置くと閉じきったあとも下端が残る */
+.bf-item__body-clip {
+  overflow: hidden;
+  /* 閉じている間はフォーカスも読み上げも当たらないようにする。
+     閉じるアニメーションが終わってから消したいので 240ms 遅らせる */
+  visibility: hidden;
+  transition: visibility 0s linear 240ms;
+}
+
+.bf-item__body[data-open='true'] .bf-item__body-clip {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.bf-item__body-inner {
   padding: 0 1rem 0.9rem 3.15rem;
 }
 
@@ -211,8 +243,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .bf__summary--skeleton,
-  .bf-item__skeleton {
+  .bf-item__skeleton,
+  .bf-item--in {
     animation: none;
+  }
+
+  .bf-item__body,
+  .bf-item__caret {
+    transition: none;
   }
 }
 
@@ -243,4 +281,41 @@
   flex: none;
   padding: 0.35rem 0.9rem;
   font-size: 0.85rem;
+}
+
+/* --- 演出（FE-3） --- */
+
+.bf-item__head:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.bf-item__head {
+  transition: background 160ms ease;
+}
+
+/* 中身が揃った 4 件を 80ms ずつずらして下から浮かせる。
+   both を付けて、順番待ちの間は透明のまま置いておく */
+.bf-item--in {
+  animation: bf-rise 320ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.bf-item--in:nth-child(2) {
+  animation-delay: 80ms;
+}
+.bf-item--in:nth-child(3) {
+  animation-delay: 160ms;
+}
+.bf-item--in:nth-child(4) {
+  animation-delay: 240ms;
+}
+
+@keyframes bf-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
