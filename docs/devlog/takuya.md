@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-08-22 — FE-1 ペルソナ定数とモック駆動の UI 骨組み
+
+- **やったこと**: `src/features/bias-filter/` に FE-1 一式（[#4](https://github.com/TakuyaMizukami7/Hackathon/issues/4) / PR #13）。
+  `personas.ts`（PERSONA_META・MAX_TEXT_LENGTH）/ `mock.ts`（MOCK_RESPONSE）/
+  `BiasFilter.tsx` / `PerspectiveList.tsx` / `PerspectiveItem.tsx` / `bias-filter.css`。
+  通信ゼロで 4 つのアコーディオンが開閉する
+- **決めたこと**:
+  - **`src/shared/types.ts` にプラン 1-3 の型を先に入れた**（BE 担当の想定だったが FE-1 が書けないため）。
+    `PersonaId` / `PERSONA_IDS` / `Perspective` / `ExpandRequest` / `ExpandResponse` の**追加のみ**
+  - `PerspectiveList` は API の返り順を信用せず `PERSONA_IDS` の順で描く
+  - `PerspectiveItem` の `perspective` は省略可能（未生成なら見出しが「生成中…」）。
+    FE-2 のローディング表示はここに繋ぐだけでよい設計にした
+  - CSS は機能ディレクトリ内で完結。`src/index.css` には足していない
+- **未検証**: ブラウザでの目視確認。型 / lint / フォーマット / `npm run build` は通っている
+- **次やること**: FE-2。`BiasFilter.tsx` の `handleExpand()` を `fetch('/api/expand')` に差し替える
+- **相方への申し送り**: 上記のとおり **types.ts に 5 つの型を追加済み**。BE 側で重複追加しないこと。
+  `src/App.tsx` は `<BiasFilter />` の 1 行追加だけ
+
 ## 2026-08-22 — Bias Filter ▽ の実装プランと Issue 8 件を用意
 
 - **やったこと**: [docs/PLAN_BIAS_FILTER.md](../PLAN_BIAS_FILTER.md) を追加（#3 でマージ済み）。
