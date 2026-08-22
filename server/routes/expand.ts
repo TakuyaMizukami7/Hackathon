@@ -1,6 +1,8 @@
+import { GoogleGenAI } from '@google/genai'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import type { ExpandRequest, ExpandResponse } from '../../src/shared/types'
+import { generateExpand, isRetryable, readableMessage } from '../lib/gemini'
 
 /**
  * POST /api/expand
@@ -75,6 +77,34 @@ expand.post('/', async (c) => {
     return c.json(MOCK_RESPONSE, 200)
   }
 
-  // 実際の Gemini 呼び出しは BE-2 で実装する
-  return c.json({ error: 'モック以外の応答は未実装です(BE-2 で対応予定)' }, 501)
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) {
+    return c.json(
+      {
+        error:
+          'GEMINI_API_KEY が未設定です。ローカルは .env.local、本番は Railway の Variables に登録してください。',
+      },
+      500,
+    )
+  }
+
+  const ai = new GoogleGenAI({ apiKey })
+
+  let result: ExpandResponse
+  try {
+    result = await generateExpand(ai, text)
+  } catch (err) {
+    const detail = readableMessage(err)
+    if (isRetryable(err)) {
+      // Gemini 側の一時的な混雑。こちらのバグではないと分かる文面にする
+      return c.json(
+        { error: `Gemini が混雑しています。数十秒待ってもう一度送ってください。詳細: ${detail}` },
+        503,
+        { 'retry-after': '10' },
+      )
+    }
+    return c.json({ error: `Gemini の呼び出しに失敗しました: ${detail}` }, 502)
+  }
+
+  return c.json(result, 200)
 })
