@@ -314,6 +314,12 @@
   background: rgba(34, 211, 238, 0.12);
 }
 
+/* 「最新ニュース取得」ボタン。押すまでお題チップが隠れているので、通常チップより目立たせる */
+.bf__chip--fetch {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* 免責。読ませるためではなく「先回りで潰してある」ことを見せるためのもの */
 .bf__disclaimer {
   margin-top: 1.75rem;
