@@ -1,8 +1,13 @@
-/* Bias Filter ▽ 専用のスタイル。ダークテーマ固定。
+/* オルタナ▽レンズ 専用のスタイル。ダークテーマ固定。
    グローバル(src/index.css)には足さない。全部この中で完結させる。 */
 
 .bf {
   --bf-panel: #1c1e26;
+  /* レンズの光。サイバーパンク寄せのネオンブルー(cyan) */
+  --bf-lens: #22d3ee;
+  /* この機能の中だけ accent を cyan に寄せる（グローバルの --accent は変えない）。
+     チップのホバー・不定形バー・「もう一度」がまとめてレンズの色になる */
+  --accent: #22d3ee;
   margin-top: 1.5rem;
 }
 
@@ -10,10 +15,16 @@
   margin-bottom: 1rem;
 }
 
+/* アプリ名。レンズを通した光がにじんでいるように、cyan の光彩を 3 段で重ねる */
 .bf__title {
-  font-size: 1.6rem;
-  letter-spacing: 0.01em;
+  font-size: clamp(1.6rem, 6vw, 2.1rem);
+  letter-spacing: 0.14em;
   margin: 0;
+  color: #eafcff;
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.6),
+    0 0 14px rgba(34, 211, 238, 0.5),
+    0 0 38px rgba(34, 211, 238, 0.22);
 }
 
 .bf__lead {
@@ -26,14 +37,17 @@
   width: 100%;
 }
 
+/* 主役ボタンを画面の中央に据えるため、横並びをやめて縦に積む。
+   文字数カウントは右端に逃がして、視線の中心はボタンだけにする */
 .bf__actions {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 0.35rem;
 }
 
 .bf__count {
+  align-self: flex-end;
   color: var(--muted);
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
@@ -297,7 +311,7 @@
 
 .bf__chip:not(:disabled):hover {
   border-color: var(--accent);
-  background: rgba(108, 140, 255, 0.12);
+  background: rgba(34, 211, 238, 0.12);
 }
 
 /* 免責。読ませるためではなく「先回りで潰してある」ことを見せるためのもの */
@@ -484,5 +498,175 @@
   .bf-item__body,
   .bf-item__caret {
     transition: none;
+  }
+}
+
+/* --- 主役ボタン「▽ オルタナ・レンズを通す」（FE-6 / Issue #29） ---
+
+   このアプリで一番押してほしいものなので、ボタンではなく「レンズそのもの」に見せる。
+   ・形    : clip-path で巨大な逆三角形（▽）に切り抜く
+   ・レンズ : 透過背景 + backdrop-filter でうっすら向こう側が歪んで見える
+   ・光    : clip-path は box-shadow ごと切り落とすので、光彩は
+             三角形の輪郭に沿ってくれる filter: drop-shadow() で出す */
+
+.bf__submit {
+  /* button のグローバルスタイル（margin-top / 塗り / 角丸）を打ち消す */
+  margin: 0.4rem 0 0;
+  width: min(430px, 100%);
+  /* 下の余白が逆三角形の「先端」になる。文字は上半分の広いところに置く */
+  padding: 1.15rem 2rem 3.6rem;
+  border: 0;
+  border-radius: 0;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+
+  color: #eaffff;
+  font-size: clamp(0.88rem, 3.4vw, 1.05rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 12px rgba(34, 211, 238, 0.55);
+
+  /* すりガラス。下端（＝先端）に向けて光が集まるグラデーションで「焦点」を作る */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(34, 211, 238, 0.26) 0%,
+      rgba(34, 211, 238, 0.05) 45%,
+      rgba(34, 211, 238, 0.22) 100%
+    ),
+    rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(7px) saturate(150%);
+  backdrop-filter: blur(7px) saturate(150%);
+
+  filter: drop-shadow(0 0 13px rgba(34, 211, 238, 0.5))
+    drop-shadow(0 0 34px rgba(34, 211, 238, 0.22));
+  transition:
+    filter 200ms ease,
+    background 200ms ease,
+    transform 200ms ease;
+}
+
+/* ホバー（とキーボードフォーカス）で脈打たせる。
+   animation の filter が上の filter を上書きするので、base 側は消さなくてよい */
+.bf__submit:not(:disabled):hover,
+.bf__submit:not(:disabled):focus-visible {
+  transform: translateY(-1px);
+  animation: bf-lens-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes bf-lens-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.4))
+      drop-shadow(0 0 22px rgba(34, 211, 238, 0.14));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.9))
+      drop-shadow(0 0 48px rgba(34, 211, 238, 0.4));
+  }
+}
+
+/* 未入力・展開中。光を消して「まだレンズは働いていない」ことを見せる */
+.bf__submit:disabled {
+  opacity: 0.55;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+  filter: none;
+  text-shadow: none;
+}
+
+/* --- ペルソナごとの「別次元」（FE-6 / Issue #29） ---
+
+   展開した本文だけを、そのペルソナが住んでいる世界の内装に丸ごと差し替える。
+   当たり先は .bf-item__body-inner ひとつだけ。見出し行（.bf-item__head）は
+   4 件とも同じ見た目のままにして、開いた瞬間の落差を見せ場にする。
+
+   ペルソナの出し分けは <li data-persona="..."> の 1 属性だけに依存する。
+   TSX 側に分岐は書かない。 */
+
+/* 背景が付くので、上の余白 0 のままだと文字が天井に貼り付く */
+.bf-item[data-persona] .bf-item__body-inner {
+  padding-top: 0.85rem;
+}
+
+/* A 楽観主義者 — 丸ゴシック・希望の光が差し込む朝 */
+.bf-item[data-persona='optimist'] .bf-item__body-inner {
+  /* 丸ゴシックが無い環境（Windows など）では標準の sans-serif に落ちるので、
+     字間を少し開けて柔らかさを補う */
+  font-family:
+    'Hiragino Maru Gothic ProN', 'Quicksand', 'M PLUS Rounded 1c', 'Yu Gothic', system-ui,
+    sans-serif;
+  letter-spacing: 0.03em;
+  color: #fff4e2;
+  background:
+    radial-gradient(120% 95% at 16% -25%, rgba(255, 214, 138, 0.4), transparent 62%),
+    linear-gradient(180deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.04));
+}
+
+/* B 陰謀を疑う人 — 等幅・真っ黒・ネオングリーン・薄いスキャンライン */
+.bf-item[data-persona='conspiracist'] .bf-item__body-inner {
+  font-family: ui-monospace, 'SFMono-Regular', Consolas, 'Courier New', monospace;
+  font-size: 0.88rem;
+  color: #39ff6a;
+  text-shadow: 0 0 7px rgba(57, 255, 106, 0.45);
+  background:
+    repeating-linear-gradient(180deg, rgba(57, 255, 106, 0.05) 0 1px, transparent 1px 3px), #000;
+}
+
+.bf-item[data-persona='conspiracist'] .bf-item__meta {
+  color: rgba(57, 255, 106, 0.6);
+}
+
+.bf-item[data-persona='conspiracist'] .bf-item__tag {
+  border-color: rgba(57, 255, 106, 0.35);
+}
+
+/* C 100年後の歴史家 — 明朝・古文書。ここだけ背景が明るくなるので、
+   本文以外（メーター・タグ）の色もまとめてセピアに寄せないと読めない */
+.bf-item[data-persona='historian2125'] .bf-item__body-inner {
+  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', YuMincho, 'Noto Serif JP', 'MS PMincho', serif;
+  line-height: 1.85;
+  color: #4a382a;
+  text-shadow: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(120, 90, 60, 0.05) 0 3px, transparent 3px 7px),
+    radial-gradient(140% 120% at 82% -10%, rgba(163, 133, 92, 0.35), transparent 60%),
+    linear-gradient(158deg, #e9dec1 0%, #d8c8a6 55%, #c9b892 100%);
+}
+
+.bf-item[data-persona='historian2125'] .bf-item__meta {
+  color: #6b5843;
+}
+
+.bf-item[data-persona='historian2125'] .bf-item__tag {
+  border-color: rgba(90, 70, 50, 0.45);
+}
+
+/* 未点灯のメモリ。var(--line) の暗色のままだと羊皮紙の上では「点灯」に見える */
+.bf-item[data-persona='historian2125'] .bf-item__bar {
+  background: rgba(90, 70, 50, 0.2);
+}
+
+/* D 現実主義の投資家 — 最もシャープなサンセリフ。装飾なしのソリッドなダークグレー */
+.bf-item[data-persona='realist_investor'] .bf-item__body-inner {
+  font-family:
+    'Helvetica Neue', Arial, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  line-height: 1.6;
+  letter-spacing: 0;
+  color: #d8dde3;
+  background: #202429;
+}
+
+.bf-item[data-persona='realist_investor'] .bf-item__text {
+  font-weight: 500;
+}
+
+/* 上（FE-5）の reduce ブロックより後ろに書く必要があるので、ここでもう一度。
+   レンズの光彩は静止した状態で残し、脈打つ動きだけ止める */
+@media (prefers-reduced-motion: reduce) {
+  .bf__submit:not(:disabled):hover,
+  .bf__submit:not(:disabled):focus-visible {
+    animation: none;
+    transform: none;
+    filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.7));
   }
 }

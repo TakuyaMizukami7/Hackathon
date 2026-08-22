@@ -11,7 +11,7 @@ import './bias-filter.css'
 type Status = 'idle' | 'loading' | 'done' | 'error'
 
 /**
- * Bias Filter ▽ の画面。
+ * オルタナ▽レンズ の画面。
  *
  * 待ち時間を「間」にしないのがここの肝。
  * loading 中もペルソナ名つきのドロップダウンを 4 つ先に描き、
@@ -68,7 +68,7 @@ export function BiasFilter() {
   return (
     <section className="bf">
       <header className="bf__header">
-        <h1 className="bf__title">Bias Filter ▽</h1>
+        <h1 className="bf__title">オルタナ▽レンズ</h1>
         <p className="bf__lead">
           ひとつの出来事を、4 人の偏った語り手が同時に解説する。事実は 1 つ、解釈は 4 つ。
         </p>
@@ -106,7 +106,7 @@ export function BiasFilter() {
           onClick={() => void run(text)}
           disabled={loading || empty}
         >
-          {loading ? '展開中…' : '▽ 展開する'}
+          {loading ? '展開中…' : '▽ オルタナ・レンズを通す'}
         </button>
       </div>
 

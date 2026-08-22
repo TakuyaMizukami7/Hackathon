@@ -43,9 +43,12 @@ export function PerspectiveItem({
 
   return (
     // 中身が揃った瞬間に --in が付き、CSS 側の順番待ちアニメーションが 1 回だけ走る。
-    // --bf-persona は CSS のアニメーション（左端の明滅・点の色）がペルソナ色を使うため
+    // --bf-persona は CSS のアニメーション（左端の明滅・点の色）がペルソナ色を使うため。
+    // data-persona は「別次元」の内装（本文の書体・背景）を CSS 側だけで切り替えるためのフック。
+    // ここに書くのは属性 1 つだけで、分岐やスタイルの実体は bias-filter.css に置く
     <li
       className={ready ? 'bf-item bf-item--in' : thinking ? 'bf-item bf-item--thinking' : 'bf-item'}
+      data-persona={id}
       style={{ borderLeftColor: meta.color, '--bf-persona': meta.color } as CSSProperties}
     >
       <button
