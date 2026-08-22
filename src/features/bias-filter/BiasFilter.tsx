@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ExpandResponse } from '../../shared/types'
 import { PerspectiveList } from './PerspectiveList'
 import { MAX_TEXT_LENGTH } from './personas'
-import { MOCK_INPUT } from './mock'
+import { SAMPLE_INPUTS } from './samples'
 import { expand, readMockMode } from './api'
 import './bias-filter.css'
 
@@ -17,7 +17,9 @@ type Status = 'idle' | 'loading' | 'done' | 'error'
  * 本文にあたる部分だけスケルトンにする（PerspectiveItem 側）。
  */
 export function BiasFilter() {
-  const [text, setText] = useState(MOCK_INPUT)
+  // デモは必ず空欄から始める。初期値を入れておくと
+  // 「打たなくても出る」ように見えてチップの意味がなくなる
+  const [text, setText] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [result, setResult] = useState<ExpandResponse | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
@@ -31,6 +33,7 @@ export function BiasFilter() {
 
   const remaining = MAX_TEXT_LENGTH - text.length
   const loading = status === 'loading'
+  const empty = text.trim().length === 0
 
   async function run(input: string) {
     if (inFlight.current) return // 連打しても 2 本目は飛ばさない
@@ -57,11 +60,26 @@ export function BiasFilter() {
   return (
     <section className="bf">
       <header className="bf__header">
-        <h2 className="bf__title">Bias Filter ▽</h2>
+        <h1 className="bf__title">Bias Filter ▽</h1>
         <p className="bf__lead">
-          出来事をひとつ入力すると、4 人のペルソナがそれぞれの偏った視点で解説する。
+          ひとつの出来事を、4 人の偏った語り手が同時に解説する。事実は 1 つ、解釈は 4 つ。
         </p>
       </header>
+
+      <div className="bf__samples">
+        <span className="bf__samples-label">お題を選ぶ</span>
+        {SAMPLE_INPUTS.map((sample) => (
+          <button
+            key={sample.label}
+            type="button"
+            className="bf__chip"
+            onClick={() => setText(sample.text)}
+            disabled={loading}
+          >
+            {sample.label}
+          </button>
+        ))}
+      </div>
 
       <textarea
         className="bf__input"
@@ -78,7 +96,7 @@ export function BiasFilter() {
           type="button"
           className="bf__submit"
           onClick={() => void run(text)}
-          disabled={loading || text.trim().length === 0}
+          disabled={loading || empty}
         >
           {loading ? '展開中…' : '▽ 展開する'}
         </button>
@@ -103,6 +121,11 @@ export function BiasFilter() {
           <PerspectiveList perspectives={result?.perspectives ?? []} loading={loading} />
         </div>
       )}
+
+      {/* 審査員が最初に気にするのはここ。結果より下だが常に画面内に置く */}
+      <footer className="bf__disclaimer">
+        表示される解説は AI が特定の立場を演じたものです。事実ではありません。
+      </footer>
     </section>
   )
 }
