@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchHealth, streamChat } from './shared/api'
 import type { HealthResponse } from './shared/types'
+import { BiasFilter } from './features/bias-filter/BiasFilter'
 
 /**
  * ここは「配線が生きているか」を確認するだけのページ。
@@ -40,6 +41,8 @@ export default function App() {
 
   return (
     <main>
+      <BiasFilter />
+
       <h1>{import.meta.env.VITE_APP_NAME ?? 'Hackathon App'}</h1>
       <p className="lead">
         ハッカソン当日の土台。デプロイ・API・LLM の配線がつながっているかをここで確認する。

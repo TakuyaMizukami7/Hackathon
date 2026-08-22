@@ -43,3 +43,50 @@ export type HealthResponse = {
 export type ApiError = {
   error: string
 }
+
+/**
+ * ペルソナの識別子。AI はこの id 以外を返してはいけない。
+ * 表示名・絵文字・色といった見た目のメタはフロント側の定数
+ * (src/features/bias-filter/personas.ts) が持つ。
+ */
+export type PersonaId = 'optimist' | 'conspiracist' | 'historian2125' | 'realist_investor'
+
+/** 表示順。API のレスポンスもこの順で返る */
+export const PERSONA_IDS: PersonaId[] = [
+  'optimist',
+  'conspiracist',
+  'historian2125',
+  'realist_investor',
+]
+
+/** 1ペルソナ分の解説 */
+export type Perspective = {
+  id: PersonaId
+  /** 表示名（AI が返すが、FE 側の定数を優先してよい） */
+  persona: string
+  /** ドロップダウンの見出し。20文字以内の断言 */
+  headline: string
+  /** 展開したときの本文。120〜180文字 */
+  body: string
+  /** バイアスの強さ 1〜5。UI のメーター表示用 */
+  biasLevel: number
+  /** そのペルソナが好んで使う語 2〜3個。タグ表示用 */
+  keywords: string[]
+}
+
+/** POST /api/expand のリクエスト */
+export type ExpandRequest = {
+  /** ユーザーが入力した出来事・ニュース。1〜400文字 */
+  text: string
+}
+
+/** POST /api/expand のレスポンス */
+export type ExpandResponse = {
+  /** 入力の中立な一行要約（見出し用） */
+  summary: string
+  /** PERSONA_IDS と同じ順で返る */
+  perspectives: Perspective[]
+  /** 応答したモデル名。デモ中の切り分け用 */
+  model: string
+  elapsedMs: number
+}
